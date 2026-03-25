@@ -6,7 +6,6 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!-- Toolbar -->
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar_common"
@@ -17,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +33,7 @@
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:background="@drawable/bg_input_gray"
+                android:background="@drawable/bg_input_outlined"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="20dp" />
@@ -51,7 +49,7 @@
                 android:id="@+id/etDescription"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:background="@drawable/bg_input_gray"
+                android:background="@drawable/bg_input_outlined"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="20dp" />
@@ -63,13 +61,30 @@
                 android:textSize="14sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="6dp" />
-            <Spinner
-                android:id="@+id/spinnerPrivacy"
+
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:background="@drawable/bg_input_gray"
-                android:paddingStart="16dp"
-                android:layout_marginBottom="32dp" />
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/bg_input_outlined">
+
+                <Spinner
+                    android:id="@+id/spinnerPrivacy"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="48dp" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_arrow_down"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="12dp"
+                    android:clickable="false"
+                    android:focusable="false" />
+            </FrameLayout>
 
             <Button
                 android:id="@+id/btnSave"
