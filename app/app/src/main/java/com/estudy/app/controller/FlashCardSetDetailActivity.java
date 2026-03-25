@@ -9,9 +9,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.estudy.app.R;
 import com.estudy.app.api.ApiClient;
 import com.estudy.app.api.ApiService;
+import com.estudy.app.model.request.CommentRequest;
 import com.estudy.app.model.response.ApiResponse;
+import com.estudy.app.model.response.CommentResponse;
 import com.estudy.app.model.response.FlashCardSetDetailResponse;
 import com.estudy.app.utils.TokenManager;
+import java.util.ArrayList;
+import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -20,12 +24,17 @@ public class FlashCardSetDetailActivity extends AppCompatActivity {
 
     private TextView tvName, tvDescription, tvPrivacy, tvFlashCardCount;
     private RecyclerView rvComments;
-    private LinearLayout layoutFlashCards, layoutReviewHeader;
-    private ImageButton btnToggleComments;
+    private LinearLayout layoutFlashCards, layoutReviewHeader, layoutAddComment;
+    private ImageButton btnToggleComments, btnSendComment;
+    private EditText etComment;
     private ApiService apiService;
     private TokenManager tokenManager;
     private String flashCardSetId;
+    private String flashCardSetOwnerUsername = "";
     private boolean isCommentsVisible = true;
+    private boolean isPublic = false;
+    private CommentAdapter commentAdapter;
+    private List<CommentResponse> commentList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +60,15 @@ public class FlashCardSetDetailActivity extends AppCompatActivity {
         rvComments = findViewById(R.id.rvComments);
         layoutFlashCards = findViewById(R.id.layoutFlashCards);
         layoutReviewHeader = findViewById(R.id.layoutReviewHeader);
+        layoutAddComment = findViewById(R.id.layoutAddComment);
         btnToggleComments = findViewById(R.id.btnToggleComments);
+        btnSendComment = findViewById(R.id.btnSendComment);
+        etComment = findViewById(R.id.etComment);
 
         rvComments.setLayoutManager(new LinearLayoutManager(this));
 
         flashCardSetId = getIntent().getStringExtra("flashcard_set_id");
 
-        // Nhấn vào ô Flashcards → sang màn danh sách flashcard
         layoutFlashCards.setOnClickListener(v -> {
             android.content.Intent intent = new android.content.Intent(
                     this, FlashCardListActivity.class);
@@ -65,21 +76,87 @@ public class FlashCardSetDetailActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Toggle ẩn/hiện comments
         btnToggleComments.setOnClickListener(v -> toggleComments());
+
+        btnSendComment.setOnClickListener(v -> handleSendComment());
 
         loadDetail();
     }
 
     private void toggleComments() {
         isCommentsVisible = !isCommentsVisible;
-        if (isCommentsVisible) {
-            rvComments.setVisibility(View.VISIBLE);
-            btnToggleComments.setImageResource(android.R.drawable.arrow_up_float);
-        } else {
-            rvComments.setVisibility(View.GONE);
-            btnToggleComments.setImageResource(android.R.drawable.arrow_down_float);
+        rvComments.setVisibility(isCommentsVisible ? View.VISIBLE : View.GONE);
+        btnToggleComments.setImageResource(isCommentsVisible
+                ? android.R.drawable.arrow_up_float
+                : android.R.drawable.arrow_down_float);
+    }
+
+    private void handleSendComment() {
+        String content = etComment.getText().toString().trim();
+        if (content.isEmpty()) {
+            etComment.setError("Please enter a comment");
+            return;
         }
+
+        btnSendComment.setEnabled(false);
+
+        apiService.addComment(flashCardSetId, new CommentRequest(content))
+                .enqueue(new Callback<ApiResponse<CommentResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<CommentResponse>> call,
+                                           Response<ApiResponse<CommentResponse>> response) {
+                        btnSendComment.setEnabled(true);
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().getResult() != null) {
+                            // Thêm comment mới vào danh sách
+                            commentList.add(response.body().getResult());
+                            commentAdapter.notifyItemInserted(commentList.size() - 1);
+                            rvComments.scrollToPosition(commentList.size() - 1);
+                            etComment.setText("");
+
+                            // Hiện lại list nếu đang ẩn
+                            if (!isCommentsVisible) toggleComments();
+                        } else {
+                            Toast.makeText(FlashCardSetDetailActivity.this,
+                                    "Comment failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<CommentResponse>> call, Throwable t) {
+                        btnSendComment.setEnabled(true);
+                        Toast.makeText(FlashCardSetDetailActivity.this,
+                                "Connection error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void handleDeleteComment(CommentResponse item) {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Delete comment")
+                .setMessage("Are you sure you want to delete this comment?")
+                .setPositiveButton("Delete", (dialog, which) ->
+                        apiService.deleteComment(item.getId())
+                                .enqueue(new Callback<ApiResponse<Void>>() {
+                                    @Override
+                                    public void onResponse(Call<ApiResponse<Void>> call,
+                                                           Response<ApiResponse<Void>> response) {
+                                        if (response.isSuccessful()) {
+                                            commentAdapter.removeItem(item);
+                                            Toast.makeText(FlashCardSetDetailActivity.this,
+                                                    "Deleted", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ApiResponse<Void>> call,
+                                                          Throwable t) {
+                                        Toast.makeText(FlashCardSetDetailActivity.this,
+                                                "Delete failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                }))
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void loadDetail() {
@@ -103,12 +180,27 @@ public class FlashCardSetDetailActivity extends AppCompatActivity {
                                     ? data.getFlashCards().size() : 0;
                             tvFlashCardCount.setText(cardCount + " cards");
 
-                            if (data.getComments() != null && !data.getComments().isEmpty()) {
-                                CommentAdapter commentAdapter =
-                                        new CommentAdapter(data.getComments());
-                                rvComments.setAdapter(commentAdapter);
-                            } else {
-                                rvComments.setVisibility(View.GONE);
+                            // Kiểm tra privacy
+                            isPublic = "PUBLIC".equals(data.getPrivacy());
+                            layoutAddComment.setVisibility(isPublic ? View.VISIBLE : View.GONE);
+
+                            // Lấy username hiện tại từ JWT
+                            String currentUsername = tokenManager.getCurrentUsername();
+
+                            // Setup comments
+                            commentList = data.getComments() != null
+                                    ? new ArrayList<>(data.getComments())
+                                    : new ArrayList<>();
+
+                            commentAdapter = new CommentAdapter(
+                                    commentList,
+                                    currentUsername,
+                                    flashCardSetOwnerUsername,
+                                    item -> handleDeleteComment(item)
+                            );
+                            rvComments.setAdapter(commentAdapter);
+
+                            if (commentList.isEmpty()) {
                                 btnToggleComments.setVisibility(View.GONE);
                             }
                         }

@@ -21,17 +21,5 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         }, 2000);
-
-//        new Handler().postDelayed(() -> {
-//            TokenManager tokenManager = new TokenManager(this);
-//            Intent intent;
-//            if (tokenManager.hasToken()) {
-//                intent = new Intent(this, HomeActivity.class);
-//            } else {
-//                intent = new Intent(this, LoginActivity.class);
-//            }
-//            startActivity(intent);
-//            finish();
-//        }, 2000);
     }
 }
