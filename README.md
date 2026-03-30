@@ -198,7 +198,7 @@ app:
 cd backend
 
 # Lần đầu hoặc khi pom.xml thay đổi
-mvn clean install -DskipTests
+mvn clean install 
 
 # Chạy ứng dụng
 mvn spring-boot:run
@@ -219,8 +219,8 @@ http://localhost:8080/swagger-ui/index.html
 |---|---|
 | Chạy lại bình thường | `mvn spring-boot:run` |
 | Sau khi pull code mới (code thay đổi) | `mvn spring-boot:run` |
-| Sau khi pull code mới (pom.xml thay đổi) | `mvn clean install -DskipTests` → `mvn spring-boot:run` |
-| Máy mới, lần đầu setup | `mvn clean install -DskipTests` → `mvn spring-boot:run` |
+| Sau khi pull code mới (pom.xml thay đổi) | `mvn clean install ` → `mvn spring-boot:run` |
+| Máy mới, lần đầu setup | `mvn clean install ` → `mvn spring-boot:run` |
 
 ---
 
