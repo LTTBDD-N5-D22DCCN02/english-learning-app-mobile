@@ -41,14 +41,16 @@ public class User {
 
     LocalDate dob;
 
-    @Column(name = "current_streak")
-    Integer currentStreak;
+    @Column(name = "current_streak", nullable=false)
+    @Builder.Default
+    Integer currentStreak = 0;
 
-    @Column(name = "longest_streak")
-    Integer longestStreak;
+    @Column(name = "longest_streak", nullable = false)
+    @Builder.Default
+    Integer longestStreak = 0;
 
     @Column(name = "last_study_date")
-    LocalDate lastStudyDate;
+    LocalDate lastStudyDate;    // null = chưa từng học
 
     @Builder.Default
     @Column(nullable = false)
