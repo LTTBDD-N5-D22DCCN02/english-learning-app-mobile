@@ -1,49 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="62dp"
     android:background="@color/primary"
     android:orientation="horizontal"
     android:gravity="center">
 
-    <LinearLayout android:id="@+id/btnNavHome" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Home -->
+    <LinearLayout
+        android:id="@+id/btnNavHome"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_home" />
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_nav_home" />
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/btnNavSets" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Cards / Sets -->
+    <LinearLayout
+        android:id="@+id/btnNavSets"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_folder" />
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_nav_folder" />
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/btnNavAdd" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Add (nút giữa) -->
+    <LinearLayout
+        android:id="@+id/btnNavAdd"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_add" />
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_nav_add" />
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/btnNavNotif" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Notifications + badge đỏ -->
+    <FrameLayout
+        android:id="@+id/btnNavNotif"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_bell" />
-    </LinearLayout>
 
-    <LinearLayout android:id="@+id/btnNavStats" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_nav_bell"
+            android:layout_gravity="center" />
+
+        <!-- Badge đỏ -->
+        <TextView
+            android:id="@+id/tvNotifBadge"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="0"
+            android:textSize="9sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:background="@drawable/bg_badge_notif"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Stats -->
+    <LinearLayout
+        android:id="@+id/btnNavStats"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_stats" />
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_nav_stats" />
     </LinearLayout>
 
 </LinearLayout>

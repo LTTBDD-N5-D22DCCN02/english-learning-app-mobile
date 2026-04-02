@@ -29,6 +29,7 @@
         <activity android:name=".controller.FlashCardSetEditActivity" />
         <activity android:name=".controller.FlashCardSetDetailActivity" />
         <activity android:name=".controller.FlashCardListActivity" />
+        <activity android:name=".controller.StudyTodayActivity" android:exported="false" />
     </application>
 
 </manifest>
