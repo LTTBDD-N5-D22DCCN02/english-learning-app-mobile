@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
     <LinearLayout
@@ -93,7 +93,7 @@
                 android:layout_height="48dp"
                 android:src="@android:drawable/ic_menu_view"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:tint="#757575" />
+                app:tint="#757575" />
         </LinearLayout>
 
         <!-- Error password -->

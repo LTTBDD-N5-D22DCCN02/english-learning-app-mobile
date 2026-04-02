@@ -10,6 +10,7 @@ import com.estudy.app.model.response.AuthResponse;
 import com.estudy.app.model.response.CommentResponse;
 import com.estudy.app.model.response.FlashCardSetDetailResponse;
 import com.estudy.app.model.response.FlashCardSetResponse;
+import com.estudy.app.model.response.StudyTodayResponse;
 import com.estudy.app.model.response.UserResponse;
 
 import java.util.List;
@@ -50,4 +51,59 @@ public interface ApiService {
 
     @DELETE("flashcard-sets/comments/{commentId}")
     Call<ApiResponse<Void>> deleteComment(@Path("commentId") String commentId);
+
+    // ── Study Today
+    @GET("study/today")
+    Call<ApiResponse<StudyTodayResponse>> getStudyToday();
+
+    // ── Quiz Session
+//    @POST("study/session/start")
+//    Call<ApiResponse<QuizSessionResponse>> startSession(@Body StartSessionRequest request);
+//
+//    @PUT("study/session/{sessionId}/end")
+//    Call<ApiResponse<Void>> endSession(@Path("sessionId") String sessionId,
+//                                       @Body EndSessionRequest request);
+//
+//    // ── Answer card (cập nhật StudyRecord + SM-2) ────────────────
+//    @POST("study/answer")
+//    Call<ApiResponse<Void>> submitAnswer(@Body AnswerRequest request);
+
+    // ── Statistics ────────────────────────────────────────────────
+//    @GET("study/stats/summary")
+//    Call<ApiResponse<StatSummaryResponse>> getStatSummary();
+//
+//    @GET("study/stats/activity")
+//    Call<ApiResponse<List<DayActivityResponse>>> getStudyActivity(
+//            @Query("period") String period // "weekly" | "monthly"
+//    );
+//
+//    @GET("study/stats/sets")
+//    Call<ApiResponse<List<SetProgressResponse>>> getSetProgress();
+
+
+// ── Request/Response models cần tạo thêm ─────────────────────────
+
+// StartSessionRequest.java
+// {
+//   "setId": "uuid",
+//   "mode": "flashcard" | "word_quiz" | "match" | "spelling"
+// }
+
+// AnswerRequest.java
+// {
+//   "flashcardId": "uuid",
+//   "sessionId":   "uuid",
+//   "remembered":  true | false   // cho flashcard mode
+//   "correct":     true | false   // cho quiz mode
+// }
+
+// QuizSessionResponse.java — trả về sessionId để track phiên học
+
+// StatSummaryResponse.java — { wordsLearned, wordsMastered, correctCount,
+//                               wrongCount, currentStreak, longestStreak }
+
+// DayActivityResponse.java — { date, rememberedCount, notYetCount }
+
+// SetProgressResponse.java — { setId, setName, totalWords,
+//                              rememberedCount, percentage }
 }
