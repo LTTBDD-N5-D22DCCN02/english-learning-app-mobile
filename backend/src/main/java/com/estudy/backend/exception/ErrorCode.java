@@ -73,6 +73,18 @@ public enum ErrorCode {
     COMMENT_NOT_OWNED(2301, "You do not have permission to delete this comment", HttpStatus.FORBIDDEN),
     COMMENT_CONTENT_REQUIRED(2302, "Comment content must not be blank", HttpStatus.BAD_REQUEST),
     COMMENT_CONTENT_INVALID(2303, "Comment content must not exceed 1000 characters", HttpStatus.BAD_REQUEST),
+    // ==========================
+    // CLASS
+    // ==========================
+    CLASS_NOT_FOUND(3100, "Class not found", HttpStatus.NOT_FOUND),
+    CLASS_NAME_REQUIRED(3101, "Class name must not be blank", HttpStatus.BAD_REQUEST),
+    CLASS_NOT_LEADER(3102, "Only the class leader can perform this action", HttpStatus.FORBIDDEN),
+    CLASS_ALREADY_MEMBER(3103, "You are already a member of this class", HttpStatus.BAD_REQUEST),
+    CLASS_JOIN_REQUEST_PENDING(3104, "Your join request is already pending approval", HttpStatus.BAD_REQUEST),
+    CLASS_INVALID_CODE(3105, "Invalid class code", HttpStatus.BAD_REQUEST),
+    CLASS_LEADER_CANNOT_LEAVE(3106, "Class leader cannot leave the class. Delete the class instead.", HttpStatus.BAD_REQUEST),
+    CLASS_MEMBER_NOT_FOUND(3107, "Class member not found", HttpStatus.NOT_FOUND),
+    CLASS_NOT_PUBLIC(3108, "This class is not public. Please use class code to join.", HttpStatus.BAD_REQUEST),
     ;
 
     int code;
