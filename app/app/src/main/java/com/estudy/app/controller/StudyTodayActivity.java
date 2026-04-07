@@ -10,17 +10,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.estudy.app.R;
 import com.estudy.app.api.ApiClient;
 import com.estudy.app.api.ApiService;
-import com.estudy.app.model.response.ApiResponse;
-import com.estudy.app.model.response.StudySetItem;
-import com.estudy.app.model.response.StudyTodayResponse;
+import com.estudy.app.model.response.*;
 import com.estudy.app.utils.TokenManager;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import java.util.*;
+
+/**
+ * UC-STUDY-01: "Study Today" screen.
+ * Accessible ONLY from HomeActivity — NOT part of the bottom nav.
+ */
 public class StudyTodayActivity extends AppCompatActivity {
 
     private TextView tvSubtitle, tvDueCount, tvNewCount, tvDoneCount;
@@ -29,6 +30,7 @@ public class StudyTodayActivity extends AppCompatActivity {
     private RecyclerView rvDueSets, rvNewSets;
     private LinearLayout layoutDueSection, layoutNewSection, layoutEmpty;
     private ProgressBar progressBar;
+
     private ApiService apiService;
 
     @Override
@@ -36,11 +38,10 @@ public class StudyTodayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study_today);
 
-        TokenManager tokenManager = new TokenManager(this);
-        apiService = ApiClient.getInstance(tokenManager).create(ApiService.class);
+        TokenManager tm = new TokenManager(this);
+        apiService = ApiClient.getInstance(tm).create(ApiService.class);
 
         setupToolbar();
-        setupBottomNav();
         bindViews();
         loadStudyToday();
     }
@@ -51,51 +52,14 @@ public class StudyTodayActivity extends AppCompatActivity {
         loadStudyToday();
     }
 
-    // ── Dùng toolbar_common.xml ────────────────────────────────────
     private void setupToolbar() {
-        // toolbar_common có id: btnBack, tvToolbarTitle, btnSettings
-        View toolbar = findViewById(R.id.toolbar);
-        if (toolbar == null) return;
-
-        // Set title
-        TextView tvTitle = toolbar.findViewById(R.id.tvToolbarTitle);
-        if (tvTitle != null) tvTitle.setText("Study today");
-
-        // Back button
-        ImageButton btnBack = toolbar.findViewById(R.id.btnBack);
+        ImageButton btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> finish());
 
-        // Settings button
-        ImageButton btnSettings = toolbar.findViewById(R.id.btnSettings);
-        if (btnSettings != null) {
-            btnSettings.setOnClickListener(v ->
-                    Toast.makeText(this, "Settings — coming soon!", Toast.LENGTH_SHORT).show());
-        }
+        TextView tvTitle = findViewById(R.id.tvToolbarTitle);
+        if (tvTitle != null) tvTitle.setText("Study today");
     }
 
-    // ── Bottom nav — wire tất cả 5 button ──────────────────────────
-    private void setupBottomNav() {
-        View btnHome  = findViewById(R.id.btnNavHome);
-        View btnSets  = findViewById(R.id.btnNavSets);
-        View btnAdd   = findViewById(R.id.btnNavAdd);
-        View btnNotif = findViewById(R.id.btnNavNotif);
-        View btnStats = findViewById(R.id.btnNavStats);
-
-        if (btnHome != null) btnHome.setOnClickListener(v -> {
-            Intent i = new Intent(this, HomeActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(i);
-        });
-        if (btnSets  != null) btnSets.setOnClickListener(v ->
-                startActivity(new Intent(this, FlashCardSetListActivity.class)));
-        if (btnAdd   != null) btnAdd.setOnClickListener(v ->
-                startActivity(new Intent(this, FlashCardSetCreateActivity.class)));
-        if (btnNotif != null) btnNotif.setOnClickListener(v ->
-                Toast.makeText(this, "Notifications — coming soon!", Toast.LENGTH_SHORT).show());
-        if (btnStats != null) btnStats.setOnClickListener(v -> { /* đang ở đây */ });
-    }
-
-    // ── Bind content views ─────────────────────────────────────────
     private void bindViews() {
         tvSubtitle       = findViewById(R.id.tvSubtitle);
         tvDueCount       = findViewById(R.id.tvDueCount);
@@ -111,65 +75,57 @@ public class StudyTodayActivity extends AppCompatActivity {
         layoutEmpty      = findViewById(R.id.layoutEmpty);
         progressBar      = findViewById(R.id.progressBar);
 
-        rvDueSets.setLayoutManager(new LinearLayoutManager(this));
-        rvNewSets.setLayoutManager(new LinearLayoutManager(this));
-        rvDueSets.setNestedScrollingEnabled(false);
-        rvNewSets.setNestedScrollingEnabled(false);
-
-        // Icon gamepad trên section Due → mở BottomSheet cho tất cả due sets
-        View btnDueMode = findViewById(R.id.btnDueMode);
-        if (btnDueMode != null) {
-            btnDueMode.setOnClickListener(v ->
-                    showModeBottomSheet("", "Due today - All sets"));
+        if (rvDueSets != null) {
+            rvDueSets.setLayoutManager(new LinearLayoutManager(this));
+            rvDueSets.setNestedScrollingEnabled(false);
         }
+        if (rvNewSets != null) {
+            rvNewSets.setLayoutManager(new LinearLayoutManager(this));
+            rvNewSets.setNestedScrollingEnabled(false);
+        }
+
+        View btnDueMode = findViewById(R.id.btnDueMode);
+        if (btnDueMode != null)
+            btnDueMode.setOnClickListener(v -> showModeBottomSheet("", "Due today - All sets"));
     }
 
-    // ── Load API ───────────────────────────────────────────────────
     private void loadStudyToday() {
         showLoading(true);
-
         apiService.getStudyToday().enqueue(new Callback<ApiResponse<StudyTodayResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<StudyTodayResponse>> call,
                                    Response<ApiResponse<StudyTodayResponse>> response) {
                 showLoading(false);
-                if (response.isSuccessful()
-                        && response.body() != null
+                if (response.isSuccessful() && response.body() != null
                         && response.body().getResult() != null) {
-                    bindData(response.body().getResult());
-                } else {
-                    Toast.makeText(StudyTodayActivity.this,
-                            "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
+                    bindStudyData(response.body().getResult());
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<StudyTodayResponse>> call, Throwable t) {
                 showLoading(false);
-                Toast.makeText(StudyTodayActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void bindData(StudyTodayResponse data) {
+    private void bindStudyData(StudyTodayResponse data) {
         int totalDue = data.getTotalDue();
         int totalNew = data.getTotalNew();
         int total    = totalDue + totalNew;
 
-        tvDueCount.setText(String.valueOf(totalDue));
-        tvNewCount.setText(String.valueOf(totalNew));
-        tvDoneCount.setText("0");
-        tvSubtitle.setText(total + " words · " + countSets(data) + " sets");
+        if (tvDueCount  != null) tvDueCount.setText(String.valueOf(totalDue));
+        if (tvNewCount  != null) tvNewCount.setText(String.valueOf(totalNew));
+        if (tvDoneCount != null) tvDoneCount.setText("0");
+        if (tvSubtitle  != null) tvSubtitle.setText(total + " words · " + countSets(data) + " sets");
 
-        // Nút Study all
         if (btnStudyAll != null) {
             btnStudyAll.setText("Study all (" + total + ")");
             btnStudyAll.setVisibility(total > 0 ? View.VISIBLE : View.GONE);
             btnStudyAll.setOnClickListener(v -> showModeBottomSheet("", "All sets"));
         }
 
-        // Section Due
+        // Due section
         List<StudySetItem> dueSets = data.getDueSets();
         if (dueSets != null && !dueSets.isEmpty()) {
             layoutDueSection.setVisibility(View.VISIBLE);
@@ -179,10 +135,10 @@ public class StudyTodayActivity extends AppCompatActivity {
             dueAdapter.setOnArrowClickListener(item -> openSetWords(item, true));
             rvDueSets.setAdapter(dueAdapter);
         } else {
-            layoutDueSection.setVisibility(View.GONE);
+            if (layoutDueSection != null) layoutDueSection.setVisibility(View.GONE);
         }
 
-        // Section New
+        // New section
         List<StudySetItem> newSets = data.getNewSets();
         if (newSets != null && !newSets.isEmpty()) {
             layoutNewSection.setVisibility(View.VISIBLE);
@@ -192,15 +148,11 @@ public class StudyTodayActivity extends AppCompatActivity {
             newAdapter.setOnArrowClickListener(item -> openSetWords(item, false));
             rvNewSets.setAdapter(newAdapter);
         } else {
-            layoutNewSection.setVisibility(View.GONE);
+            if (layoutNewSection != null) layoutNewSection.setVisibility(View.GONE);
         }
 
-        // Empty
-        if (total == 0) {
-            layoutEmpty.setVisibility(View.VISIBLE);
-        } else {
-            layoutEmpty.setVisibility(View.GONE);
-        }
+        if (layoutEmpty != null)
+            layoutEmpty.setVisibility(total == 0 ? View.VISIBLE : View.GONE);
     }
 
     // ── Mở word list của 1 bộ ─────────────────────────────────────
@@ -214,8 +166,7 @@ public class StudyTodayActivity extends AppCompatActivity {
 
     // ── Mở bottom sheet chọn chế độ học ───────────────────────────
     private void showModeBottomSheet(String setId, String setName) {
-        StudyModeBottomSheet sheet =
-                StudyModeBottomSheet.newInstance(setId, setName);
+        StudyModeBottomSheet sheet = StudyModeBottomSheet.newInstance(setId, setName);
         sheet.show(getSupportFragmentManager(), "StudyMode");
     }
 

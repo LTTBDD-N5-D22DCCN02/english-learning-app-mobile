@@ -4,6 +4,7 @@ import com.estudy.backend.dto.request.AnswerRequest;
 import com.estudy.backend.dto.response.ApiResponse;
 import com.estudy.backend.dto.response.StudyTodayResponse;
 import com.estudy.backend.service.StudyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +15,57 @@ public class StudyController {
 
     private final StudyService studyService;
 
-    // GET /study/today
+    /** GET /study/today — UC-STUDY-01 */
     @GetMapping("/today")
     public ApiResponse<StudyTodayResponse> getStudyToday() {
         return ApiResponse.<StudyTodayResponse>builder()
-                .result(studyService.getStudyToday())
-                .build();
+                .result(studyService.getStudyToday()).build();
+    }
+
+    /** POST /study/session/start — UC-STUDY-02~05 */
+    @PostMapping("/session/start")
+    public ApiResponse<StartSessionResponse> startSession(
+            @Valid @RequestBody StartSessionRequest req) {
+        return ApiResponse.<StartSessionResponse>builder()
+                .result(studyService.startSession(req)).build();
+    }
+
+    /** POST /study/answer — UC-STUDY-02~05 */
+    @PostMapping("/answer")
+    public ApiResponse<Void> submitAnswer(@Valid @RequestBody AnswerRequest req) {
+        studyService.submitAnswer(req);
+        return ApiResponse.<Void>builder().build();
+    }
+
+    /** PUT /study/session/{id}/end — UC-STUDY-02~05 + UC-STUDY-06 */
+    @PutMapping("/session/{sessionId}/end")
+    public ApiResponse<SessionResultResponse> endSession(
+            @PathVariable UUID sessionId,
+            @RequestBody(required = false) List<String> wrongTerms) {
+        return ApiResponse.<SessionResultResponse>builder()
+                .result(studyService.endSession(sessionId, wrongTerms)).build();
+    }
+
+    /** GET /study/stats/summary — UC-STAT-01,02,03 */
+    @GetMapping("/stats/summary")
+    public ApiResponse<StatSummaryResponse> getStatSummary() {
+        return ApiResponse.<StatSummaryResponse>builder()
+                .result(studyService.getStatSummary()).build();
+    }
+
+    /** GET /study/stats/activity?period=weekly|monthly — UC-STAT-04,05 */
+    @GetMapping("/stats/activity")
+    public ApiResponse<List<DayActivityResponse>> getStudyActivity(
+            @RequestParam(defaultValue = "weekly") String period) {
+        return ApiResponse.<List<DayActivityResponse>>builder()
+                .result(studyService.getStudyActivity(period)).build();
+    }
+
+    /** GET /study/stats/sets — UC-STAT-06 */
+    @GetMapping("/stats/sets")
+    public ApiResponse<List<SetProgressResponse>> getSetProgress() {
+        return ApiResponse.<List<SetProgressResponse>>builder()
+                .result(studyService.getSetProgress()).build();
     }
 
     // POST /study/answer — ghi nhận kết quả + cập nhật SM-2

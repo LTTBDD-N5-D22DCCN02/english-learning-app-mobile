@@ -14,6 +14,7 @@ import com.estudy.app.model.request.LogoutRequest;
 import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.FlashCardSetResponse;
 import com.estudy.app.model.response.StudyTodayResponse;
+import com.estudy.app.utils.BottomNavHelper;
 import com.estudy.app.utils.TokenManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
-    // ── Views ──────────────────────────────────────────────────────
+    // ── Views ───
     private RecyclerView rvFlashCardSets, rvClasses;
     private TextView tvSeeAllSets, tvSeeAllClasses, tvEmptySets, tvEmptyClasses;
     private TextView tvTotalTerms, tvDueCount, tvNewCount, tvDoneCount;
@@ -37,6 +38,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        BottomNavHelper.setup(this, R.id.btnNavHome);
 
         tokenManager = new TokenManager(this);
         apiService   = ApiClient.getInstance(tokenManager).create(ApiService.class);
@@ -102,27 +104,6 @@ public class HomeActivity extends AppCompatActivity {
         btnStudyAll.setOnClickListener(v ->
                 startActivity(new Intent(this, StudyTodayActivity.class)));
 
-        // Bottom nav
-        View btnNavHome  = findViewById(R.id.btnNavHome);
-        View btnNavSets  = findViewById(R.id.btnNavSets);
-        View btnNavAdd   = findViewById(R.id.btnNavAdd);
-        View btnNavNotif = findViewById(R.id.btnNavNotif);
-        View btnNavStats = findViewById(R.id.btnNavStats);
-
-        if (btnNavHome  != null) btnNavHome.setOnClickListener(v -> { /* đang ở Home */ });
-        if (btnNavSets  != null) btnNavSets.setOnClickListener(v ->
-                startActivity(new Intent(this, FlashCardSetListActivity.class)));
-        if (btnNavAdd   != null) btnNavAdd.setOnClickListener(v ->
-                startActivity(new Intent(this, FlashCardSetCreateActivity.class)));
-        if (btnNavNotif != null) {
-            btnNavNotif.setOnClickListener(v ->
-                    Toast.makeText(this, "Notifications — coming soon!", Toast.LENGTH_SHORT).show());
-        }
-
-        if (btnNavStats != null) {
-            btnNavStats.setOnClickListener(v ->
-                    startActivity(new Intent(this, StudyTodayActivity.class)));
-        }
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -215,17 +196,17 @@ public class HomeActivity extends AppCompatActivity {
                 });
     }
 
-    // ──────────────────────────────────────────────────────────────
-    // Classes: chờ Yến làm, tạm thời empty
-    // ──────────────────────────────────────────────────────────────
+    // ──────────
+    // Classes:
+    // ──────────
     private void showEmptyClasses() {
         rvClasses.setVisibility(View.GONE);
         tvEmptyClasses.setVisibility(View.VISIBLE);
     }
 
-    // ──────────────────────────────────────────────────────────────
+    // ─────────
     // Logout
-    // ──────────────────────────────────────────────────────────────
+    // ─────────
     private void showLogoutDialog() {
         new android.app.AlertDialog.Builder(this)
                 .setTitle("Logout")

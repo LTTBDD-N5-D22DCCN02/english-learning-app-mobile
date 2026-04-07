@@ -52,7 +52,7 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
         optWordQuiz  = view.findViewById(R.id.optWordQuiz);
         optMatch     = view.findViewById(R.id.optMatch);
         optSpelling  = view.findViewById(R.id.optSpelling);
-        Button btnStart  = view.findViewById(R.id.btnStart);
+        Button    btnStart = view.findViewById(R.id.btnStart);
         ImageButton btnClose = view.findViewById(R.id.btnClose);
 
         selectMode("flashcard");
@@ -132,5 +132,6 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
                 Toast.makeText(getContext(), "Flashcard — coming soon!", Toast.LENGTH_SHORT).show();
                 break;
         }
+        startActivity(intent);
     }
 }

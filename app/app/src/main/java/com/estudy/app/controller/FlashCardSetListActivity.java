@@ -12,6 +12,7 @@ import com.estudy.app.api.ApiClient;
 import com.estudy.app.api.ApiService;
 import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.FlashCardSetResponse;
+import com.estudy.app.utils.BottomNavHelper;
 import com.estudy.app.utils.TokenManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class FlashCardSetListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard_set_list);
+        BottomNavHelper.setup(this, R.id.btnNavSets);
 
         tokenManager = new TokenManager(this);
         apiService = ApiClient.getInstance(tokenManager).create(ApiService.class);

@@ -11,6 +11,7 @@ import com.estudy.app.api.ApiClient;
 import com.estudy.app.api.ApiService;
 import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.FlashCardSetDetailResponse;
+import com.estudy.app.utils.BottomNavHelper;
 import com.estudy.app.utils.TokenManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,6 +28,7 @@ public class FlashCardListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard_list);
+        BottomNavHelper.setup(this, R.id.btnNavSets);
 
         TokenManager tokenManager = new TokenManager(this);
         apiService = ApiClient.getInstance(tokenManager).create(ApiService.class);

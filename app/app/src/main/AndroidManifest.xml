@@ -34,6 +34,7 @@
         <activity android:name=".controller.SpellingActivity" android:exported="false" />
         <activity android:name=".controller.MatchActivity" android:exported="false" />
         <activity android:name=".controller.StudyResultActivity" android:exported="false" />
+
     </application>
 
 </manifest>

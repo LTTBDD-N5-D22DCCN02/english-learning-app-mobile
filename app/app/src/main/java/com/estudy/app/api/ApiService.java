@@ -6,11 +6,17 @@ import com.estudy.app.model.request.FlashCardSetRequest;
 import com.estudy.app.model.request.LoginRequest;
 import com.estudy.app.model.request.LogoutRequest;
 import com.estudy.app.model.request.RegisterRequest;
+import com.estudy.app.model.request.StartSessionRequest;
 import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.AuthResponse;
 import com.estudy.app.model.response.CommentResponse;
+import com.estudy.app.model.response.DayActivityResponse;
 import com.estudy.app.model.response.FlashCardSetDetailResponse;
 import com.estudy.app.model.response.FlashCardSetResponse;
+import com.estudy.app.model.response.SessionResultResponse;
+import com.estudy.app.model.response.SetProgressResponse;
+import com.estudy.app.model.response.StartSessionResponse;
+import com.estudy.app.model.response.StatSummaryResponse;
 import com.estudy.app.model.response.StudyTodayResponse;
 import com.estudy.app.model.response.UserResponse;
 
@@ -20,7 +26,7 @@ import retrofit2.http.*;
 
 public interface ApiService {
 
-    // Auth
+    // ── Auth ──────────────────────────────────────────────────────────
     @POST("auth/register")
     Call<ApiResponse<UserResponse>> register(@Body RegisterRequest request);
 
@@ -30,7 +36,7 @@ public interface ApiService {
     @POST("auth/logout")
     Call<ApiResponse<Void>> logout(@Body LogoutRequest request);
 
-    // FlashCard Set
+    // ── FlashCard Set ─────────────────────────────────────────────────
     @GET("flashcard-sets/my")
     Call<ApiResponse<List<FlashCardSetResponse>>> getMyFlashCardSets();
 
@@ -41,19 +47,22 @@ public interface ApiService {
     Call<ApiResponse<FlashCardSetResponse>> createFlashCardSet(@Body FlashCardSetRequest request);
 
     @PUT("flashcard-sets/{id}")
-    Call<ApiResponse<FlashCardSetResponse>> updateFlashCardSet(@Path("id") String id, @Body FlashCardSetRequest request);
+    Call<ApiResponse<FlashCardSetResponse>> updateFlashCardSet(
+            @Path("id") String id, @Body FlashCardSetRequest request);
 
     @DELETE("flashcard-sets/{id}")
     Call<ApiResponse<Void>> deleteFlashCardSet(@Path("id") String id);
 
-    // Comment
+    // ── Comment ───────────────────────────────────────────────────────
     @POST("flashcard-sets/{flashCardSetId}/comments")
-    Call<ApiResponse<CommentResponse>> addComment(@Path("flashCardSetId") String flashCardSetId, @Body CommentRequest request);
+    Call<ApiResponse<CommentResponse>> addComment(
+            @Path("flashCardSetId") String flashCardSetId,
+            @Body CommentRequest request);
 
     @DELETE("flashcard-sets/comments/{commentId}")
     Call<ApiResponse<Void>> deleteComment(@Path("commentId") String commentId);
 
-    // ── Study Today
+    // ── UC-STUDY-01: Study Today ───────────────────────────────────────
     @GET("study/today")
     Call<ApiResponse<StudyTodayResponse>> getStudyToday();
 

@@ -9,9 +9,7 @@ import com.estudy.backend.entity.StudyRecord;
 import com.estudy.backend.entity.User;
 import com.estudy.backend.exception.AppException;
 import com.estudy.backend.exception.ErrorCode;
-import com.estudy.backend.repository.FlashCardRepository;
-import com.estudy.backend.repository.StudyRecordRepository;
-import com.estudy.backend.repository.UserRepository;
+import com.estudy.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,11 +25,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StudyService {
 
-    private final StudyRecordRepository studyRecordRepository;
-    private final FlashCardRepository flashCardRepository;
-    private final UserRepository userRepository;
+    private final StudyRecordRepository  studyRecordRepository;
+    private final QuizSessionRepository  quizSessionRepository;
+    private final FlashCardRepository    flashCardRepository;
+    private final FlashCardSetRepository flashCardSetRepository;
+    private final UserRepository         userRepository;
 
-    // ── UC-STUDY-01: Lấy danh sách từ cần ôn hôm nay ─────────────
+    // ── UC-STUDY-01 ──
     public StudyTodayResponse getStudyToday() {
         UUID userId = getCurrentUserId();
         LocalDate today = LocalDate.now();
@@ -43,17 +43,45 @@ public class StudyService {
                 flashCardRepository.findNewCardsByUserId(userId);
 
         Map<UUID, List<StudyRecord>> dueBySet = dueRecords.stream()
-                .collect(Collectors.groupingBy(
-                        sr -> sr.getFlashcard().getFlashCardSet().getId()));
+                .collect(Collectors.groupingBy(sr -> sr.getFlashcard().getFlashCardSet().getId()));
+        Map<UUID, List<FlashCard>>   newBySet = newCards.stream()
+                .collect(Collectors.groupingBy(fc -> fc.getFlashCardSet().getId()));
 
-        Map<UUID, List<FlashCard>> newBySet = newCards.stream()
-                .collect(Collectors.groupingBy(
-                        fc -> fc.getFlashCardSet().getId()));
+        return new StudyTodayResponse(dueRecords.size(), newCards.size(),
+                buildDueItems(dueBySet), buildNewItems(newBySet));
+    }
+
+    // ── UC-STUDY-02~05: Start session ──
+    @Transactional
+    public StartSessionResponse startSession(StartSessionRequest req) {
+        UUID userId = getCurrentUserId();
+        User user   = getUser(userId);
+
+        FlashCardSet set = flashCardSetRepository.findByIdAndDeletedFalse(req.getSetId())
+                .orElseThrow(() -> new AppException(ErrorCode.FLASHCARD_SET_NOT_FOUND));
+
+        LocalDate today = LocalDate.now();
+        List<FlashCard> dueCards = studyRecordRepository
+                .findDueTodayBySetIds(userId, today, List.of(set.getId()))
+                .stream().map(StudyRecord::getFlashcard).collect(Collectors.toList());
+        List<FlashCard> newCards = flashCardRepository
+                .findNewCardsBySetIds(userId, List.of(set.getId()));
+
+        List<FlashCard> cards = new ArrayList<>(dueCards);
+        cards.addAll(newCards);
+        if (cards.isEmpty())
+            cards = flashCardRepository.findByFlashCardSetIdAndDeletedFalse(set.getId());
 
         List<StudySetItemResponse> dueSets = buildDueItems(dueBySet);
         List<StudySetItemResponse> newSets  = buildNewItems(newBySet);
 
-        return new StudyTodayResponse(dueRecords.size(), newCards.size(), dueSets, newSets);
+        return StartSessionResponse.builder()
+                .sessionId(session.getId().toString())
+                .setId(set.getId().toString())
+                .setName(set.getName())
+                .mode(req.getMode())
+                .cards(buildCardResponses(cards, req.getMode(), set.getId()))
+                .build();
     }
 
     // ── UC-STUDY-02: Ghi nhận kết quả trả lời + cập nhật SM-2 ─────
@@ -161,27 +189,97 @@ public class StudyService {
                 .collect(Collectors.toList());
     }
 
+    // ── Helpers ──
+    private int[] updateStreak(User user) {
+        LocalDate today = LocalDate.now();
+        LocalDate last  = user.getLastStudyDate();
+        if (last == null)                        user.setCurrentStreak(1);
+        else if (last.equals(today))             { /* no-op */ }
+        else if (last.equals(today.minusDays(1))) user.setCurrentStreak(user.getCurrentStreak() + 1);
+        else                                     user.setCurrentStreak(1);
+        user.setLastStudyDate(today);
+        int isNew = 0;
+        if (user.getCurrentStreak() > user.getLongestStreak()) {
+            user.setLongestStreak(user.getCurrentStreak()); isNew = 1;
+        }
+        return new int[]{user.getCurrentStreak(), isNew};
+    }
+
+    private void applySM2(StudyRecord r, boolean correct) {
+        if (correct) {
+            int n = r.getRepetitionCount();
+            int interval = n == 0 ? 1 : n == 1 ? 6 : Math.round(r.getIntervalDays() * r.getEaseFactor());
+            r.setEaseFactor(Math.max(1.3f, r.getEaseFactor() + 0.1f));
+            r.setIntervalDays(interval);
+            r.setRepetitionCount(n + 1);
+        } else {
+            r.setEaseFactor(Math.max(1.3f, r.getEaseFactor() - 0.2f));
+            r.setIntervalDays(1);
+            r.setRepetitionCount(0);
+        }
+        r.setNextReviewAt(LocalDate.now().plusDays(r.getIntervalDays()));
+    }
+
+    private boolean determineCorrect(String mode, AnswerRequest req) {
+        return "flashcard".equals(mode)
+                ? Boolean.TRUE.equals(req.getRemembered())
+                : Boolean.TRUE.equals(req.getCorrect());
+    }
+
+    private List<StartSessionResponse.SessionCardResponse> buildCardResponses(
+            List<FlashCard> cards, String mode, UUID setId) {
+        List<String> allDefs = "word_quiz".equals(mode)
+                ? flashCardRepository.findByFlashCardSetIdAndDeletedFalse(setId)
+                  .stream().map(FlashCard::getDefinition).filter(Objects::nonNull)
+                  .collect(Collectors.toList())
+                : List.of();
+
+        return cards.stream().map(fc -> {
+            List<String> distractors = List.of();
+            if ("word_quiz".equals(mode)) {
+                List<String> pool = allDefs.stream()
+                        .filter(d -> !d.equals(fc.getDefinition()))
+                        .collect(Collectors.toList());
+                Collections.shuffle(pool);
+                distractors = pool.stream().limit(3).collect(Collectors.toList());
+            }
+            return StartSessionResponse.SessionCardResponse.builder()
+                    .flashcardId(fc.getId().toString()).term(fc.getTerm())
+                    .definition(fc.getDefinition()).ipa(fc.getIpa())
+                    .audioUrl(null) // ⚠ Cần API TTS — xem ghi chú bên dưới
+                    .image(fc.getImage()).example(fc.getExample())
+                    .distractors(distractors).build();
+        }).collect(Collectors.toList());
+    }
+
+    private List<StudySetItemResponse> buildDueItems(Map<UUID, List<StudyRecord>> map) {
+        return map.entrySet().stream().map(e -> {
+            List<StudyRecord> records = e.getValue();
+            FlashCardSet set = records.get(0).getFlashcard().getFlashCardSet();
+            List<String> preview = records.stream().limit(3)
+                    .map(sr -> sr.getFlashcard().getTerm()).collect(Collectors.toList());
+            long rem = records.stream().filter(sr -> Boolean.TRUE.equals(sr.getRemembered())).count();
+            String last = records.stream().map(StudyRecord::getLastStudiedAt)
+                    .filter(Objects::nonNull).max(Comparator.naturalOrder())
+                    .map(dt -> formatDate(dt.toLocalDate())).orElse("Never studied");
+            int total = (int) set.getFlashCards().stream()
+                    .filter(f -> !Boolean.TRUE.equals(f.getDeleted())).count();
+            return new StudySetItemResponse(set.getId().toString(), set.getName(),
+                    records.size(), total, (int) rem, last, preview);
+        }).collect(Collectors.toList());
+    }
+
     private List<StudySetItemResponse> buildNewItems(Map<UUID, List<FlashCard>> map) {
-        return map.entrySet().stream()
-                .map(e -> {
-                    List<FlashCard> cards = e.getValue();
-                    FlashCardSet set = cards.get(0).getFlashCardSet();
-
-                    List<String> preview = cards.stream()
-                            .limit(3)
-                            .map(FlashCard::getTerm)
-                            .collect(Collectors.toList());
-
-                    int totalWords = (int) set.getFlashCards().stream()
-                            .filter(f -> !Boolean.TRUE.equals(f.getDeleted()))
-                            .count();
-
-                    return new StudySetItemResponse(
-                            set.getId().toString(), set.getName(),
-                            cards.size(), totalWords, 0,
-                            "Never studied", preview);
-                })
-                .collect(Collectors.toList());
+        return map.entrySet().stream().map(e -> {
+            List<FlashCard> cards = e.getValue();
+            FlashCardSet set = cards.get(0).getFlashCardSet();
+            List<String> preview = cards.stream().limit(3)
+                    .map(FlashCard::getTerm).collect(Collectors.toList());
+            int total = (int) set.getFlashCards().stream()
+                    .filter(f -> !Boolean.TRUE.equals(f.getDeleted())).count();
+            return new StudySetItemResponse(set.getId().toString(), set.getName(),
+                    cards.size(), total, 0, "Never studied", preview);
+        }).collect(Collectors.toList());
     }
 
     private String formatDate(LocalDate date) {

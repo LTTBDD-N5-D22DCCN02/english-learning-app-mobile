@@ -1,19 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/background">
 
     <!-- ── Toolbar ── -->
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar_common"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/primary"
+        android:paddingHorizontal="8dp">
 
-    <!-- ── Stats card: nằm NGOÀI toolbar, trên nền background ── -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_back_circle"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@color/white"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:id="@+id/tvToolbarTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Study today"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_marginEnd="40dp" />
+
+    </LinearLayout>
+
+    <!-- Stats summary card -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +49,7 @@
         android:paddingTop="14dp"
         android:paddingBottom="6dp">
 
-        <!-- Subtitle -->
+        <!-- Subtitle: X words · Y sets -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
@@ -33,9 +59,8 @@
             android:textSize="12sp"
             android:layout_marginBottom="10dp" />
 
-        <!-- Card trắng viền xanh -->
+        <!-- Card Due/New/Done -->
         <com.google.android.material.card.MaterialCardView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
@@ -52,7 +77,7 @@
                 android:paddingTop="12dp"
                 android:paddingBottom="10dp">
 
-                <!-- 3 số -->
+                <!-- 3 counters -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="72dp"
@@ -140,14 +165,14 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Divider ngang nét đứt -->
+                <!-- Divider -->
                 <com.estudy.app.utils.DashedDividerView
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="8dp" />
 
-                <!-- Nút Study all -->
+                <!-- Study all button -->
                 <Button
                     android:id="@+id/btnStudyAll"
                     android:layout_width="wrap_content"
@@ -162,12 +187,11 @@
                     android:insetBottom="0dp"
                     android:visibility="gone"
                     style="@style/Widget.Material3.Button.OutlinedButton" />
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <!-- ── Nội dung cuộn ── -->
+    <!-- Scrollable list of sets -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -180,7 +204,7 @@
             android:orientation="vertical"
             android:paddingBottom="16dp">
 
-            <!-- ── Section DUE TODAY ── -->
+            <!-- Section DUE TODAY -->
             <LinearLayout
                 android:id="@+id/layoutDueSection"
                 android:layout_width="match_parent"
@@ -221,7 +245,6 @@
                         android:textColor="#94a3b8"
                         android:layout_marginEnd="8dp" />
 
-                    <!-- Icon game controller -->
                     <ImageView
                         android:id="@+id/btnDueMode"
                         android:layout_width="32dp"
@@ -239,7 +262,7 @@
                     android:paddingHorizontal="12dp" />
             </LinearLayout>
 
-            <!-- ── Section NEW WORDS ── -->
+            <!-- Section NEW WORDS -->
             <LinearLayout
                 android:id="@+id/layoutNewSection"
                 android:layout_width="match_parent"
@@ -280,7 +303,6 @@
                         android:textColor="#94a3b8"
                         android:layout_marginEnd="8dp" />
 
-                    <!-- Shuffle icon -->
                     <ImageView
                         android:id="@+id/btnShuffle"
                         android:layout_width="32dp"
@@ -298,7 +320,7 @@
                     android:paddingHorizontal="12dp" />
             </LinearLayout>
 
-            <!-- ── Empty state ── -->
+            <!-- Empty state -->
             <LinearLayout
                 android:id="@+id/layoutEmpty"
                 android:layout_width="match_parent"
@@ -341,12 +363,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="48dp"
-                android:visibility="visible" />
-
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
-
-    <!-- ── Bottom nav ── -->
-    <include layout="@layout/bottom_nav" />
 
 </LinearLayout>
