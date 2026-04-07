@@ -1,10 +1,12 @@
 package com.estudy.backend.service;
 
+import com.estudy.backend.dto.request.AnswerRequest;
 import com.estudy.backend.dto.response.StudySetItemResponse;
 import com.estudy.backend.dto.response.StudyTodayResponse;
 import com.estudy.backend.entity.FlashCard;
 import com.estudy.backend.entity.FlashCardSet;
 import com.estudy.backend.entity.StudyRecord;
+import com.estudy.backend.entity.User;
 import com.estudy.backend.exception.AppException;
 import com.estudy.backend.exception.ErrorCode;
 import com.estudy.backend.repository.FlashCardRepository;
@@ -13,8 +15,10 @@ import com.estudy.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,15 +36,12 @@ public class StudyService {
         UUID userId = getCurrentUserId();
         LocalDate today = LocalDate.now();
 
-        // 1. Từ cần ôn (có StudyRecord, nextReviewAt <= today)
         List<StudyRecord> dueRecords =
                 studyRecordRepository.findDueToday(userId, today);
 
-        // 2. Từ mới chưa học — dùng query trong FlashCardRepository
         List<FlashCard> newCards =
                 flashCardRepository.findNewCardsByUserId(userId);
 
-        // 3. Nhóm theo setId
         Map<UUID, List<StudyRecord>> dueBySet = dueRecords.stream()
                 .collect(Collectors.groupingBy(
                         sr -> sr.getFlashcard().getFlashCardSet().getId()));
@@ -49,13 +50,83 @@ public class StudyService {
                 .collect(Collectors.groupingBy(
                         fc -> fc.getFlashCardSet().getId()));
 
-        // 4. Build response
         List<StudySetItemResponse> dueSets = buildDueItems(dueBySet);
         List<StudySetItemResponse> newSets  = buildNewItems(newBySet);
 
         return new StudyTodayResponse(dueRecords.size(), newCards.size(), dueSets, newSets);
     }
 
+    // ── UC-STUDY-02: Ghi nhận kết quả trả lời + cập nhật SM-2 ─────
+    @Transactional
+    public void submitAnswer(AnswerRequest request) {
+        UUID userId = getCurrentUserId();
+        User user = userRepository.findByUsernameAndDeletedFalse(
+                SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        UUID flashcardId = UUID.fromString(request.getFlashcardId());
+        FlashCard flashcard = flashCardRepository.findById(flashcardId)
+                .orElseThrow(() -> new AppException(ErrorCode.FLASHCARD_NOT_EXISTED));
+
+        boolean correct = Boolean.TRUE.equals(request.getCorrect());
+
+        // Tìm hoặc tạo StudyRecord
+        StudyRecord record = studyRecordRepository
+                .findByUserIdAndFlashcardId(userId, flashcardId)
+                .orElse(StudyRecord.builder()
+                        .user(user)
+                        .flashcard(flashcard)
+                        .build());
+
+        // Áp dụng thuật toán SM-2
+        applySM2(record, correct);
+
+        studyRecordRepository.save(record);
+    }
+
+    // ── SM-2 Algorithm ──────────────────────────────────────────────
+    private void applySM2(StudyRecord record, boolean correct) {
+        // Quality: 4 = correct, 0 = wrong (simplified)
+        int quality = correct ? 4 : 0;
+
+        float ef = record.getEaseFactor() != null ? record.getEaseFactor() : 2.5f;
+        int interval = record.getIntervalDays() != null ? record.getIntervalDays() : 1;
+        int rep = record.getRepetitionCount() != null ? record.getRepetitionCount() : 0;
+
+        if (quality < 3) {
+            // Wrong: reset repetition
+            rep = 0;
+            interval = 1;
+        } else {
+            // Correct: update EF and interval
+            ef += 0.1f - (5 - quality) * (0.08f + (5 - quality) * 0.02f);
+            ef = Math.max(1.3f, ef);
+
+            if (rep == 0) {
+                interval = 1;
+            } else if (rep == 1) {
+                interval = 6;
+            } else {
+                interval = Math.round(interval * ef);
+            }
+            rep += 1;
+        }
+
+        record.setEaseFactor(ef);
+        record.setIntervalDays(interval);
+        record.setRepetitionCount(rep);
+        record.setNextReviewAt(LocalDate.now().plusDays(interval));
+        record.setLastStudiedAt(LocalDateTime.now());
+        record.setRemembered(correct);
+
+        if (correct) {
+            record.setCorrectCount((record.getCorrectCount() != null ? record.getCorrectCount() : 0) + 1);
+        } else {
+            record.setWrongCount((record.getWrongCount() != null ? record.getWrongCount() : 0) + 1);
+        }
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────
     private List<StudySetItemResponse> buildDueItems(Map<UUID, List<StudyRecord>> map) {
         return map.entrySet().stream()
                 .map(e -> {

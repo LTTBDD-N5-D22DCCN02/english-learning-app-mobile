@@ -1,5 +1,6 @@
 package com.estudy.app.api;
 
+import com.estudy.app.model.request.AnswerRequest;
 import com.estudy.app.model.request.CommentRequest;
 import com.estudy.app.model.request.FlashCardSetRequest;
 import com.estudy.app.model.request.LoginRequest;
@@ -55,6 +56,10 @@ public interface ApiService {
     // ── Study Today
     @GET("study/today")
     Call<ApiResponse<StudyTodayResponse>> getStudyToday();
+
+    // ── Submit Answer (SM-2 update)
+    @POST("study/answer")
+    Call<ApiResponse<Void>> submitAnswer(@Body AnswerRequest request);
 
     // ── Quiz Session
 //    @POST("study/session/start")

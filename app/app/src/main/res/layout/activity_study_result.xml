@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <!-- ── Toolbar ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:elevation="2dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_back_circle"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            app:tint="@color/primary"/>
+
+        <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/btnSettings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_settings"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            app:tint="@color/primary"/>
+    </LinearLayout>
+
+    <!-- ── Content ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp">
+
+        <!-- Result card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/white"
+            app:strokeWidth="2dp"
+            app:strokeColor="#10B981">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Result"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary"
+                    android:layout_marginBottom="24dp"/>
+
+                <!-- Circular accuracy display -->
+                <FrameLayout
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp">
+
+                    <!-- Circular border -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        app:cardCornerRadius="80dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:strokeWidth="6dp"
+                        app:strokeColor="#E2E8F0">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Your accuracy"
+                                android:textSize="12sp"
+                                android:textColor="#94A3B8"
+                                android:gravity="center"/>
+
+                            <TextView
+                                android:id="@+id/tvAccuracy"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="80%"
+                                android:textSize="30sp"
+                                android:textStyle="bold"
+                                android:textColor="#D97706"
+                                android:gravity="center"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </FrameLayout>
+
+                <!-- F and T counters -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@android:drawable/ic_dialog_alert"
+                        app:tint="#EF4444"/>
+                    <TextView
+                        android:id="@+id/tvWrongCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="F: 40"
+                        android:textSize="14sp"
+                        android:textColor="#EF4444"
+                        android:textStyle="bold"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="24dp"/>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="#10B981"/>
+                    <TextView
+                        android:id="@+id/tvCorrectCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="T: 160"
+                        android:textSize="14sp"
+                        android:textColor="#10B981"
+                        android:textStyle="bold"
+                        android:layout_marginStart="4dp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Study Again button (yellow) -->
+        <Button
+            android:id="@+id/btnStudyAgain"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginBottom="12dp"
+            android:text="  Study Again"
+            android:drawableStart="@drawable/ic_refresh"
+            android:drawablePadding="8dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#92400E"
+            android:backgroundTint="#FDE68A"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="14dp"/>
+
+        <!-- View Statistics button (blue) -->
+        <Button
+            android:id="@+id/btnViewStats"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginBottom="12dp"
+            android:text="  View Statistics"
+            android:drawableStart="@drawable/ic_chart_line"
+            android:drawablePadding="8dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/primary"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="14dp"/>
+
+        <!-- Back to Home button (pink) -->
+        <Button
+            android:id="@+id/btnBackHome"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:text="  Back to Home"
+            android:drawableStart="@drawable/ic_nav_home"
+            android:drawablePadding="8dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#BE123C"
+            android:backgroundTint="#FEE2E2"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="14dp"/>
+
+    </LinearLayout>
+</LinearLayout>

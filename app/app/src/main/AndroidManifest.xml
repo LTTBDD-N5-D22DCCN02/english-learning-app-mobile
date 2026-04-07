@@ -30,6 +30,10 @@
         <activity android:name=".controller.FlashCardSetDetailActivity" />
         <activity android:name=".controller.FlashCardListActivity" />
         <activity android:name=".controller.StudyTodayActivity" android:exported="false" />
+        <activity android:name=".controller.StudySetWordsActivity" android:exported="false" />
+        <activity android:name=".controller.SpellingActivity" android:exported="false" />
+        <activity android:name=".controller.MatchActivity" android:exported="false" />
+        <activity android:name=".controller.StudyResultActivity" android:exported="false" />
     </application>
 
 </manifest>

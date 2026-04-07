@@ -174,9 +174,10 @@ public class StudyTodayActivity extends AppCompatActivity {
         if (dueSets != null && !dueSets.isEmpty()) {
             layoutDueSection.setVisibility(View.VISIBLE);
             tvDueTotalLabel.setText(totalDue + " words");
-            rvDueSets.setAdapter(new StudySetAdapter(dueSets, true,
-                    // Click vào 1 bộ → mở bottom sheet chọn mode
-                    item -> showModeBottomSheet(item.getSetId(), item.getSetName())));
+            StudySetAdapter dueAdapter = new StudySetAdapter(dueSets, true,
+                    item -> showModeBottomSheet(item.getSetId(), item.getSetName()));
+            dueAdapter.setOnArrowClickListener(item -> openSetWords(item, true));
+            rvDueSets.setAdapter(dueAdapter);
         } else {
             layoutDueSection.setVisibility(View.GONE);
         }
@@ -186,8 +187,10 @@ public class StudyTodayActivity extends AppCompatActivity {
         if (newSets != null && !newSets.isEmpty()) {
             layoutNewSection.setVisibility(View.VISIBLE);
             tvNewTotalLabel.setText(totalNew + " words");
-            rvNewSets.setAdapter(new StudySetAdapter(newSets, false,
-                    item -> showModeBottomSheet(item.getSetId(), item.getSetName())));
+            StudySetAdapter newAdapter = new StudySetAdapter(newSets, false,
+                    item -> showModeBottomSheet(item.getSetId(), item.getSetName()));
+            newAdapter.setOnArrowClickListener(item -> openSetWords(item, false));
+            rvNewSets.setAdapter(newAdapter);
         } else {
             layoutNewSection.setVisibility(View.GONE);
         }
@@ -198,6 +201,15 @@ public class StudyTodayActivity extends AppCompatActivity {
         } else {
             layoutEmpty.setVisibility(View.GONE);
         }
+    }
+
+    // ── Mở word list của 1 bộ ─────────────────────────────────────
+    private void openSetWords(StudySetItem item, boolean isDue) {
+        Intent i = new Intent(this, StudySetWordsActivity.class);
+        i.putExtra(StudySetWordsActivity.EXTRA_SET_ID, item.getSetId());
+        i.putExtra(StudySetWordsActivity.EXTRA_SET_NAME, item.getSetName());
+        i.putExtra(StudySetWordsActivity.EXTRA_IS_DUE, isDue);
+        startActivity(i);
     }
 
     // ── Mở bottom sheet chọn chế độ học ───────────────────────────

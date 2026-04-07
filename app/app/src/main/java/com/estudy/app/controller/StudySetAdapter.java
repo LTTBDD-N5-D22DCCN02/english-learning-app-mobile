@@ -16,15 +16,24 @@ public class StudySetAdapter extends RecyclerView.Adapter<StudySetAdapter.ViewHo
         void onSetClick(StudySetItem item);
     }
 
+    public interface OnArrowClickListener {
+        void onArrowClick(StudySetItem item);
+    }
+
     private final List<StudySetItem> items;
     private final boolean isDueList;
     private final OnSetClickListener listener;
+    private OnArrowClickListener arrowListener;
 
     public StudySetAdapter(List<StudySetItem> items, boolean isDueList,
                            OnSetClickListener listener) {
         this.items    = items;
         this.isDueList = isDueList;
         this.listener  = listener;
+    }
+
+    public void setOnArrowClickListener(OnArrowClickListener arrowListener) {
+        this.arrowListener = arrowListener;
     }
 
     @NonNull
@@ -42,7 +51,15 @@ public class StudySetAdapter extends RecyclerView.Adapter<StudySetAdapter.ViewHo
 
         h.tvSetName.setText(item.getSetName());
         h.tvSetSubtitle.setText(item.getLastReviewedAt());
-        h.tvWordCount.setText(item.getWordCount() + " words");
+
+        String wordCountText = item.getWordCount() + " words";
+        h.tvWordCount.setText(wordCountText);
+
+        // Color based on section: red for due, blue for new
+        int wordColor = isDueList
+                ? Color.parseColor("#E24B4A")  // red = due
+                : Color.parseColor("#378ADD"); // blue = new
+        h.tvWordCount.setTextColor(wordColor);
 
         // Progress bar
         int progress = item.getTotalWords() > 0
@@ -64,9 +81,18 @@ public class StudySetAdapter extends RecyclerView.Adapter<StudySetAdapter.ViewHo
             }
         }
 
+        // Click entire card → open mode selection
         h.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onSetClick(item);
         });
+
+        // Click arrow → open word list
+        if (h.btnArrow != null) {
+            h.btnArrow.setOnClickListener(v -> {
+                if (arrowListener != null) arrowListener.onArrowClick(item);
+                else if (listener != null) listener.onSetClick(item);
+            });
+        }
     }
 
     @Override
@@ -104,6 +130,7 @@ public class StudySetAdapter extends RecyclerView.Adapter<StudySetAdapter.ViewHo
         TextView tvSetName, tvSetSubtitle, tvWordCount;
         ProgressBar progressBar;
         LinearLayout layoutWordPreview;
+        View btnArrow;
 
         ViewHolder(View v) {
             super(v);
@@ -112,6 +139,7 @@ public class StudySetAdapter extends RecyclerView.Adapter<StudySetAdapter.ViewHo
             tvWordCount       = v.findViewById(R.id.tvWordCount);
             progressBar       = v.findViewById(R.id.progressBar);
             layoutWordPreview = v.findViewById(R.id.layoutWordPreview);
+            btnArrow          = v.findViewById(R.id.btnArrow);
         }
     }
 }
