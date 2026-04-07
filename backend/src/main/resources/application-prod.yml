@@ -23,7 +23,7 @@ logging:
     org.hibernate.orm.jdbc.bind: WARN
 
 jwt:
-  signerKey: ${JWT_SIGNER_KEY:default_jwt_key_here}
+  signerKey: ${JWT_SIGNER_KEY:default_jwt_key_here} # Tạo tại https://jwtsecretkeygenerator.com (512-bit)
   valid-duration: 3600
   refreshable-duration: 36000
 

@@ -21,4 +21,12 @@ public interface QuizSessionRepository extends JpaRepository<QuizSession, UUID> 
     List<QuizSession> findCompletedSessions(
             @Param("uid") UUID uid,
             @Param("from") LocalDateTime from);
+    
+    @Query(value = """
+    SELECT COUNT(DISTINCT DATE(qs.started_at))
+    FROM quiz_session qs
+    WHERE qs.user_id = :uid
+      AND qs.ended_at IS NOT NULL
+    """, nativeQuery = true)
+    long countStudyDays(@Param("uid") UUID uid);
 }

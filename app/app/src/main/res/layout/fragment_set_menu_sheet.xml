@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="20dp">
+
+    <!-- Save to library -->
+    <LinearLayout android:id="@+id/btnSave"
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="4dp">
+        <TextView android:layout_width="32dp" android:layout_height="wrap_content"
+            android:text="🔖" android:textSize="18sp" android:gravity="center" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Save to library"
+            android:textSize="15sp" android:textColor="@color/text_primary"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- Download offline -->
+    <LinearLayout android:id="@+id/btnDownload"
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="4dp">
+        <TextView android:layout_width="32dp" android:layout_height="wrap_content"
+            android:text="⬇" android:textSize="18sp" android:gravity="center" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Download offline"
+            android:textSize="15sp" android:textColor="@color/text_primary"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- Share link -->
+    <LinearLayout android:id="@+id/btnShareLink"
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="4dp">
+        <TextView android:layout_width="32dp" android:layout_height="wrap_content"
+            android:text="🔗" android:textSize="18sp" android:gravity="center" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Copy link"
+            android:textSize="15sp" android:textColor="@color/text_primary"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- Duplicate -->
+    <LinearLayout android:id="@+id/btnDuplicate"
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="4dp">
+        <TextView android:layout_width="32dp" android:layout_height="wrap_content"
+            android:text="📋" android:textSize="18sp" android:gravity="center" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Duplicate set"
+            android:textSize="15sp" android:textColor="@color/text_primary"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- Auto play -->
+    <LinearLayout android:id="@+id/btnAutoPlay"
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="4dp">
+        <TextView android:layout_width="32dp" android:layout_height="wrap_content"
+            android:text="▶" android:textSize="18sp" android:gravity="center" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Auto play"
+            android:textSize="15sp" android:textColor="@color/text_primary"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View android:layout_width="match_parent" android:layout_height="1dp"
+        android:background="#E2E8F0" android:layout_marginVertical="4dp" />
+
+    <!-- Edit set -->
+    <LinearLayout android:id="@+id/btnEdit"
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="4dp">
+        <TextView android:layout_width="32dp" android:layout_height="wrap_content"
+            android:text="✏" android:textSize="18sp" android:gravity="center" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Edit set"
+            android:textSize="15sp" android:textColor="@color/text_primary"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- Delete set -->
+    <LinearLayout android:id="@+id/btnDelete"
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="4dp">
+        <TextView android:layout_width="32dp" android:layout_height="wrap_content"
+            android:text="🗑" android:textSize="18sp" android:gravity="center" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Delete set"
+            android:textSize="15sp" android:textColor="@color/status_due"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+</LinearLayout>

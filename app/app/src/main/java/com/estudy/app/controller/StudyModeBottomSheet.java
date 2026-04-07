@@ -8,12 +8,10 @@ import com.estudy.app.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 /**
- * Bottom sheet dialog cho phép user chọn chế độ học.
- * Thay thế StudyModeActivity — hiển thị đúng thiết kế Figma.
- *
- * Cách gọi từ StudyTodayActivity:
- *   StudyModeBottomSheet sheet = StudyModeBottomSheet.newInstance(setId, setName);
- *   sheet.show(getSupportFragmentManager(), "StudyMode");
+ * Bottom sheet chọn chế độ học (UC-STUDY-02~05).
+ * Gọi từ StudyTodayActivity:
+ *   StudyModeBottomSheet.newInstance(setId, setName)
+ *       .show(getSupportFragmentManager(), "StudyMode");
  */
 public class StudyModeBottomSheet extends BottomSheetDialogFragment {
 
@@ -21,9 +19,8 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
     private static final String ARG_SET_NAME = "setName";
 
     private String setId, setName;
-    private String selectedMode = "flashcard"; // mặc định Flashcard
+    private String selectedMode = "flashcard";
 
-    // Views mode options
     private LinearLayout optFlashcard, optWordQuiz, optMatch, optSpelling;
 
     public static StudyModeBottomSheet newInstance(String setId, String setName) {
@@ -45,66 +42,46 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Lấy arguments
         if (getArguments() != null) {
             setId   = getArguments().getString(ARG_SET_ID,   "");
             setName = getArguments().getString(ARG_SET_NAME, "");
         }
 
-        // Set subtitle
+        // Subtitle: tên bộ
         TextView tvSetName = view.findViewById(R.id.tvSetName);
         if (tvSetName != null) tvSetName.setText(setName);
 
-        // Views
         optFlashcard = view.findViewById(R.id.optFlashcard);
         optWordQuiz  = view.findViewById(R.id.optWordQuiz);
         optMatch     = view.findViewById(R.id.optMatch);
         optSpelling  = view.findViewById(R.id.optSpelling);
-        Button btnStart  = view.findViewById(R.id.btnStart);
+        Button    btnStart = view.findViewById(R.id.btnStart);
         ImageButton btnClose = view.findViewById(R.id.btnClose);
 
         // Mặc định chọn Flashcard
         selectMode("flashcard");
 
-        // Click từng mode
         optFlashcard.setOnClickListener(v -> selectMode("flashcard"));
         optWordQuiz.setOnClickListener(v  -> selectMode("word_quiz"));
         optMatch.setOnClickListener(v     -> selectMode("match"));
         optSpelling.setOnClickListener(v  -> selectMode("spelling"));
 
-        // Nút START
-        btnStart.setOnClickListener(v -> startStudy());
-
-        // Nút Close
-        if (btnClose != null) {
-            btnClose.setOnClickListener(v -> dismiss());
-        }
+        if (btnStart != null) btnStart.setOnClickListener(v -> startStudy());
+        if (btnClose != null) btnClose.setOnClickListener(v -> dismiss());
     }
 
-    // ── Highlight mode đang chọn ────────────────────────────────
     private void selectMode(String mode) {
         selectedMode = mode;
-
-        // Reset tất cả về background trong suốt
-        setModeBackground(optFlashcard, false);
-        setModeBackground(optWordQuiz,  false);
-        setModeBackground(optMatch,     false);
-        setModeBackground(optSpelling,  false);
-
-        // Highlight cái được chọn
-        switch (mode) {
-            case "flashcard": setModeBackground(optFlashcard, true); break;
-            case "word_quiz": setModeBackground(optWordQuiz,  true); break;
-            case "match":     setModeBackground(optMatch,     true); break;
-            case "spelling":  setModeBackground(optSpelling,  true); break;
-        }
+        setModeBackground(optFlashcard, "flashcard".equals(mode));
+        setModeBackground(optWordQuiz,  "word_quiz".equals(mode));
+        setModeBackground(optMatch,     "match".equals(mode));
+        setModeBackground(optSpelling,  "spelling".equals(mode));
     }
 
     private void setModeBackground(LinearLayout view, boolean selected) {
         if (view == null) return;
         if (selected) {
             view.setBackgroundResource(R.drawable.bg_mode_selected);
-            // Bold text
             TextView tv = (TextView) view.getChildAt(0);
             if (tv != null) tv.setTypeface(null, android.graphics.Typeface.BOLD);
         } else {
@@ -114,28 +91,37 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
-    // ── Start học với mode đã chọn ──────────────────────────────
     private void startStudy() {
+        if (setId == null || setId.isEmpty()) {
+            Toast.makeText(getContext(),
+                    "Vui lòng chọn một bộ từ vựng", Toast.LENGTH_SHORT).show();
+            return;
+        }
         dismiss();
 
         Intent intent;
         switch (selectedMode) {
             case "word_quiz":
-                // TODO: intent = new Intent(getActivity(), QuizActivity.class);
-                Toast.makeText(getContext(), "Word Quiz — coming soon!", Toast.LENGTH_SHORT).show();
-                return;
+                intent = new Intent(getActivity(), WordQuizActivity.class);
+                intent.putExtra(WordQuizActivity.EXTRA_SET_ID,   setId);
+                intent.putExtra(WordQuizActivity.EXTRA_SET_NAME, setName);
+                break;
             case "match":
-                // TODO: intent = new Intent(getActivity(), MatchActivity.class);
-                Toast.makeText(getContext(), "Match — coming soon!", Toast.LENGTH_SHORT).show();
-                return;
+                intent = new Intent(getActivity(), MatchPairActivity.class);
+                intent.putExtra(MatchPairActivity.EXTRA_SET_ID,   setId);
+                intent.putExtra(MatchPairActivity.EXTRA_SET_NAME, setName);
+                break;
             case "spelling":
-                // TODO: intent = new Intent(getActivity(), SpellingActivity.class);
-                Toast.makeText(getContext(), "Spelling — coming soon!", Toast.LENGTH_SHORT).show();
-                return;
+                intent = new Intent(getActivity(), SpellingActivity.class);
+                intent.putExtra(SpellingActivity.EXTRA_SET_ID,   setId);
+                intent.putExtra(SpellingActivity.EXTRA_SET_NAME, setName);
+                break;
             default: // flashcard
-                // TODO: intent = new Intent(getActivity(), FlashcardStudyActivity.class);
-                Toast.makeText(getContext(), "Flashcard — coming soon!", Toast.LENGTH_SHORT).show();
-                return;
+                intent = new Intent(getActivity(), FlashcardStudyActivity.class);
+                intent.putExtra(FlashcardStudyActivity.EXTRA_SET_ID,   setId);
+                intent.putExtra(FlashcardStudyActivity.EXTRA_SET_NAME, setName);
+                break;
         }
+        startActivity(intent);
     }
 }

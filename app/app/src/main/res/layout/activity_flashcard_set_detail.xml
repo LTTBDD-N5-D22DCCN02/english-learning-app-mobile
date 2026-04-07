@@ -1,96 +1,273 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/background">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar_common"
+    <!-- Toolbar: back + title + 3-dot -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="56dp"
+        android:background="@color/primary"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="8dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_arrow_back_circle"
+            android:background="@null"
+            android:padding="4dp" />
+
+        <TextView
+            android:id="@+id/tvToolbarTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Set name"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:paddingHorizontal="4dp" />
+
+        <!-- 3-dot menu -->
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_more"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/white"
+            android:padding="8dp" />
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@color/background">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingBottom="20dp">
 
-            <TextView
-                android:id="@+id/tvName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tvDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textColor="#212121"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tvPrivacy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textColor="#212121"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Flashcards box -->
+            <!-- ── Row: Search + Filter + Game ─────────────── -->
             <LinearLayout
-                android:id="@+id/layoutFlashCards"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:background="@drawable/bg_flashcard_box"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginBottom="28dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Flashcards"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121" />
-
-                <TextView
-                    android:id="@+id/tvFlashCardCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="13sp"
-                    android:textColor="#757575"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- Review header -->
-            <LinearLayout
-                android:id="@+id/layoutReviewHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
+                android:padding="12dp">
+
+                <!-- Search bar -->
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:hint="Search..."
+                    android:background="@drawable/bg_input"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textSize="13sp"
+                    android:inputType="text"
+                    android:drawableStart="@android:drawable/ic_menu_search"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- Filter button -->
+                <ImageButton
+                    android:id="@+id/btnFilter"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_filter"
+                    android:background="@drawable/bg_primary_circle"
+                    app:tint="@color/white"
+                    android:padding="9dp"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- Study / Game button -->
+                <ImageButton
+                    android:id="@+id/btnStudy"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_gamepad"
+                    android:background="@drawable/bg_primary_circle"
+                    android:padding="8dp" />
+            </LinearLayout>
+
+            <!-- ── Study Progress ──────────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎯"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Study Progress"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary" />
+            </LinearLayout>
+
+            <!-- Progress card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E2E8F0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="14dp">
+
+                    <!-- Donut chart -->
+                    <com.estudy.app.utils.StudyProgressView
+                        android:id="@+id/studyProgressView"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_marginEnd="16dp" />
+
+                    <!-- Legend -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+                            <View android:layout_width="9dp" android:layout_height="9dp"
+                                android:background="@drawable/shape_dot_green"
+                                android:layout_marginEnd="8dp" />
+                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                                android:layout_weight="1" android:text="Remembered"
+                                android:textSize="12sp" android:textColor="@color/text_secondary" />
+                            <TextView android:id="@+id/tvRememberedCount"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="0" android:textSize="13sp" android:textStyle="bold"
+                                android:textColor="#4CAF50" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+                            <View android:layout_width="9dp" android:layout_height="9dp"
+                                android:background="@drawable/shape_dot_red"
+                                android:layout_marginEnd="8dp" />
+                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                                android:layout_weight="1" android:text="Need review"
+                                android:textSize="12sp" android:textColor="@color/text_secondary" />
+                            <TextView android:id="@+id/tvNeedReviewCount"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="0" android:textSize="13sp" android:textStyle="bold"
+                                android:textColor="@color/status_due" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <View android:layout_width="9dp" android:layout_height="9dp"
+                                android:background="@drawable/shape_dot_gray"
+                                android:layout_marginEnd="8dp" />
+                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                                android:layout_weight="1" android:text="Not studied"
+                                android:textSize="12sp" android:textColor="@color/text_secondary" />
+                            <TextView android:id="@+id/tvNotStudiedCount"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="0" android:textSize="13sp" android:textStyle="bold"
+                                android:textColor="#94a3b8" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ── Vocabulary header ───────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎓"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Vocabulary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary" />
+            </LinearLayout>
+
+            <!-- Vocabulary list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvFlashCards"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginBottom="16dp" />
+
+            <!-- ── Review / Comments ───────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="8dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Review"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="#212121" />
+                    android:textColor="@color/text_primary" />
 
                 <ImageButton
                     android:id="@+id/btnToggleComments"
@@ -98,18 +275,17 @@
                     android:layout_height="36dp"
                     android:src="@android:drawable/arrow_down_float"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="#212121" />
+                    app:tint="@color/text_secondary" />
             </LinearLayout>
 
-            <!-- Comments list -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvComments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
+                android:paddingHorizontal="16dp"
                 android:layout_marginBottom="12dp" />
 
-            <!-- Ô nhập comment — chỉ hiện khi PUBLIC -->
             <LinearLayout
                 android:id="@+id/layoutAddComment"
                 android:layout_width="match_parent"
@@ -119,8 +295,8 @@
                 android:background="@drawable/bg_comment_input"
                 android:paddingStart="12dp"
                 android:paddingEnd="4dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
+                android:paddingVertical="4dp"
+                android:layout_marginHorizontal="16dp"
                 android:visibility="gone">
 
                 <EditText
@@ -130,14 +306,10 @@
                     android:layout_weight="1"
                     android:hint="Write a comment..."
                     android:textSize="14sp"
-                    android:textColor="#212121"
-                    android:textColorHint="#9E9E9E"
                     android:background="@null"
-                    android:minLines="1"
-                    android:maxLines="4"
                     android:inputType="textMultiLine"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp" />
+                    android:minLines="1"
+                    android:maxLines="4" />
 
                 <ImageButton
                     android:id="@+id/btnSendComment"
@@ -145,10 +317,31 @@
                     android:layout_height="40dp"
                     android:src="@drawable/ic_send"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="@color/primary"
+                    app:tint="@color/primary"
                     android:padding="6dp" />
-
             </LinearLayout>
+
+            <!-- Hidden IDs kept for Activity compatibility -->
+            <TextView android:id="@+id/tvName" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:visibility="gone" />
+            <TextView android:id="@+id/tvDescription" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:visibility="gone" />
+            <TextView android:id="@+id/tvPrivacy" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:visibility="gone" />
+            <TextView android:id="@+id/tvFlashCardCount" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/layoutFlashCards"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/layoutReviewHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>
