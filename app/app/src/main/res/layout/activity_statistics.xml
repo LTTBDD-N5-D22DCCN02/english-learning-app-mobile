@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <!-- ── Toolbar ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/primary"
+        android:paddingHorizontal="8dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_back_circle"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@color/white"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Thống kê"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_marginEnd="40dp" />
+
+    </LinearLayout>
+
+    <!-- ── Content ── -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="14dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="24dp">
+
+            <!-- Loading indicator -->
+            <ProgressBar
+                android:id="@+id/progressBarStat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="32dp"
+                android:visibility="gone" />
+
+            <!-- ── Streak card ── -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/primary"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔥"
+                        android:textSize="36sp"
+                        android:layout_marginEnd="14dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvCurrentStreak"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 ngày liên tiếp"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/white" />
+
+                        <TextView
+                            android:id="@+id/tvLongestStreak"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Kỷ lục: 0 ngày"
+                            android:textSize="12sp"
+                            android:textColor="#BDD8F5"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                    <!-- UC-STAT-03: New Record badge -->
+                    <LinearLayout
+                        android:id="@+id/badgeNewRecord"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🏆"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Kỷ lục!"
+                            android:textSize="10sp"
+                            android:textColor="#FFC107"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ── 4 summary stat cards (2×2 grid) ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <!-- Words Learned -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2E8F0">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📖"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:id="@+id/tvWordsLearned"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="26sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/status_new"
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đã học"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Words Mastered -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2E8F0">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="✅"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:id="@+id/tvWordsMastered"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="26sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/status_done"
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đã thuộc"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="14dp">
+
+                <!-- Total answers -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2E8F0">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="💬"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:id="@+id/tvTotalAnswers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="26sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Lượt trả lời"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Accuracy -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2E8F0">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎯"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:id="@+id/tvAccuracy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—%"
+                            android:textSize="26sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/accent"
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Độ chính xác"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- ── Activity chart section header ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Hoạt động học"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#1e293b" />
+
+                <!-- Period toggle -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_white_rounded"
+                    android:paddingHorizontal="2dp">
+
+                    <TextView
+                        android:id="@+id/btnWeekly"
+                        android:layout_width="64dp"
+                        android:layout_height="match_parent"
+                        android:text="7 ngày"
+                        android:textSize="11sp"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:background="@drawable/bg_tab_selected_small" />
+
+                    <TextView
+                        android:id="@+id/btnMonthly"
+                        android:layout_width="64dp"
+                        android:layout_height="match_parent"
+                        android:text="30 ngày"
+                        android:textSize="11sp"
+                        android:gravity="center"
+                        android:textColor="@color/primary"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Bar chart -->
+            <com.estudy.app.utils.StudyBarChartView
+                android:id="@+id/barChart"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:background="@color/white"
+                android:layout_marginBottom="6dp" />
+
+            <!-- UC-STAT-05: Accuracy trend summary -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E2E8F0"
+                android:layout_marginBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Độ chính xác trung bình"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tvAvgAccuracy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—%"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+
+                        <TextView
+                            android:id="@+id/tvAccuracyTrendIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📈"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:id="@+id/tvAccuracyTrend"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="—"
+                            android:textSize="11sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ── Set progress section ── -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tiến độ từng bộ từ"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#1e293b"
+                android:layout_marginBottom="10dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvSetProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Empty stats state -->
+            <LinearLayout
+                android:id="@+id/layoutStatEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📊"
+                    android:textSize="48sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Chưa có dữ liệu thống kê"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#374151"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Hãy học một vài từ để xem thống kê!"
+                    android:textSize="12sp"
+                    android:textColor="#94a3b8"
+                    android:gravity="center" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ── Bottom nav ── -->
+    <include layout="@layout/bottom_nav" />
+
+</LinearLayout>
