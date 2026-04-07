@@ -1,16 +1,12 @@
 package com.estudy.backend.controller;
 
 import com.estudy.backend.dto.request.AnswerRequest;
-import com.estudy.backend.dto.request.StartSessionRequest;
-import com.estudy.backend.dto.response.*;
+import com.estudy.backend.dto.response.ApiResponse;
 import com.estudy.backend.dto.response.StudyTodayResponse;
 import com.estudy.backend.service.StudyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/study")
@@ -70,5 +66,12 @@ public class StudyController {
     public ApiResponse<List<SetProgressResponse>> getSetProgress() {
         return ApiResponse.<List<SetProgressResponse>>builder()
                 .result(studyService.getSetProgress()).build();
+    }
+
+    // POST /study/answer — ghi nhận kết quả + cập nhật SM-2
+    @PostMapping("/answer")
+    public ApiResponse<Void> submitAnswer(@RequestBody AnswerRequest request) {
+        studyService.submitAnswer(request);
+        return ApiResponse.<Void>builder().build();
     }
 }

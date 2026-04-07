@@ -128,11 +128,12 @@ public class StudyTodayActivity extends AppCompatActivity {
         // Due section
         List<StudySetItem> dueSets = data.getDueSets();
         if (dueSets != null && !dueSets.isEmpty()) {
-            if (layoutDueSection != null) layoutDueSection.setVisibility(View.VISIBLE);
-            if (tvDueTotalLabel  != null) tvDueTotalLabel.setText(totalDue + " words");
-            if (rvDueSets != null)
-                rvDueSets.setAdapter(new StudySetAdapter(dueSets, true,
-                        item -> showModeBottomSheet(item.getSetId(), item.getSetName())));
+            layoutDueSection.setVisibility(View.VISIBLE);
+            tvDueTotalLabel.setText(totalDue + " words");
+            StudySetAdapter dueAdapter = new StudySetAdapter(dueSets, true,
+                    item -> showModeBottomSheet(item.getSetId(), item.getSetName()));
+            dueAdapter.setOnArrowClickListener(item -> openSetWords(item, true));
+            rvDueSets.setAdapter(dueAdapter);
         } else {
             if (layoutDueSection != null) layoutDueSection.setVisibility(View.GONE);
         }
@@ -140,11 +141,12 @@ public class StudyTodayActivity extends AppCompatActivity {
         // New section
         List<StudySetItem> newSets = data.getNewSets();
         if (newSets != null && !newSets.isEmpty()) {
-            if (layoutNewSection != null) layoutNewSection.setVisibility(View.VISIBLE);
-            if (tvNewTotalLabel  != null) tvNewTotalLabel.setText(totalNew + " words");
-            if (rvNewSets != null)
-                rvNewSets.setAdapter(new StudySetAdapter(newSets, false,
-                        item -> showModeBottomSheet(item.getSetId(), item.getSetName())));
+            layoutNewSection.setVisibility(View.VISIBLE);
+            tvNewTotalLabel.setText(totalNew + " words");
+            StudySetAdapter newAdapter = new StudySetAdapter(newSets, false,
+                    item -> showModeBottomSheet(item.getSetId(), item.getSetName()));
+            newAdapter.setOnArrowClickListener(item -> openSetWords(item, false));
+            rvNewSets.setAdapter(newAdapter);
         } else {
             if (layoutNewSection != null) layoutNewSection.setVisibility(View.GONE);
         }
@@ -153,6 +155,16 @@ public class StudyTodayActivity extends AppCompatActivity {
             layoutEmpty.setVisibility(total == 0 ? View.VISIBLE : View.GONE);
     }
 
+    // ── Mở word list của 1 bộ ─────────────────────────────────────
+    private void openSetWords(StudySetItem item, boolean isDue) {
+        Intent i = new Intent(this, StudySetWordsActivity.class);
+        i.putExtra(StudySetWordsActivity.EXTRA_SET_ID, item.getSetId());
+        i.putExtra(StudySetWordsActivity.EXTRA_SET_NAME, item.getSetName());
+        i.putExtra(StudySetWordsActivity.EXTRA_IS_DUE, isDue);
+        startActivity(i);
+    }
+
+    // ── Mở bottom sheet chọn chế độ học ───────────────────────────
     private void showModeBottomSheet(String setId, String setName) {
         StudyModeBottomSheet sheet = StudyModeBottomSheet.newInstance(setId, setName);
         sheet.show(getSupportFragmentManager(), "StudyMode");

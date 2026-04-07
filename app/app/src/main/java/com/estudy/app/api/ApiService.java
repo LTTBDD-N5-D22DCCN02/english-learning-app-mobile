@@ -66,28 +66,58 @@ public interface ApiService {
     @GET("study/today")
     Call<ApiResponse<StudyTodayResponse>> getStudyToday();
 
-    // ── UC-STUDY-02~05: Session management ────────────────────────────
-    @POST("study/session/start")
-    Call<ApiResponse<StartSessionResponse>> startSession(@Body StartSessionRequest request);
-
+    // ── Submit Answer (SM-2 update)
     @POST("study/answer")
     Call<ApiResponse<Void>> submitAnswer(@Body AnswerRequest request);
 
-    @PUT("study/session/{sessionId}/end")
-    Call<ApiResponse<SessionResultResponse>> endSession(
-            @Path("sessionId") String sessionId,
-            @Body List<String> wrongTerms);
+    // ── Quiz Session
+//    @POST("study/session/start")
+//    Call<ApiResponse<QuizSessionResponse>> startSession(@Body StartSessionRequest request);
+//
+//    @PUT("study/session/{sessionId}/end")
+//    Call<ApiResponse<Void>> endSession(@Path("sessionId") String sessionId,
+//                                       @Body EndSessionRequest request);
+//
+//    // ── Answer card (cập nhật StudyRecord + SM-2) ────────────────
+//    @POST("study/answer")
+//    Call<ApiResponse<Void>> submitAnswer(@Body AnswerRequest request);
 
-    // ── UC-STAT-01,02,03: Summary statistics ──────────────────────────
-    @GET("study/stats/summary")
-    Call<ApiResponse<StatSummaryResponse>> getStatSummary();
+    // ── Statistics ────────────────────────────────────────────────
+//    @GET("study/stats/summary")
+//    Call<ApiResponse<StatSummaryResponse>> getStatSummary();
+//
+//    @GET("study/stats/activity")
+//    Call<ApiResponse<List<DayActivityResponse>>> getStudyActivity(
+//            @Query("period") String period // "weekly" | "monthly"
+//    );
+//
+//    @GET("study/stats/sets")
+//    Call<ApiResponse<List<SetProgressResponse>>> getSetProgress();
 
-    // ── UC-STAT-04,05: Daily activity ─────────────────────────────────
-    @GET("study/stats/activity")
-    Call<ApiResponse<List<DayActivityResponse>>> getStudyActivity(
-            @Query("period") String period);  // "weekly" | "monthly"
 
-    // ── UC-STAT-06: Per-set progress ──────────────────────────────────
-    @GET("study/stats/sets")
-    Call<ApiResponse<List<SetProgressResponse>>> getSetProgress();
+// ── Request/Response models cần tạo thêm ─────────────────────────
+
+// StartSessionRequest.java
+// {
+//   "setId": "uuid",
+//   "mode": "flashcard" | "word_quiz" | "match" | "spelling"
+// }
+
+// AnswerRequest.java
+// {
+//   "flashcardId": "uuid",
+//   "sessionId":   "uuid",
+//   "remembered":  true | false   // cho flashcard mode
+//   "correct":     true | false   // cho quiz mode
+// }
+
+// QuizSessionResponse.java — trả về sessionId để track phiên học
+
+// StatSummaryResponse.java — { wordsLearned, wordsMastered, correctCount,
+//                               wrongCount, currentStreak, longestStreak }
+
+// DayActivityResponse.java — { date, rememberedCount, notYetCount }
+
+// SetProgressResponse.java — { setId, setName, totalWords,
+//                              rememberedCount, percentage }
 }

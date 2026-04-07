@@ -67,6 +67,11 @@ public enum ErrorCode {
     FLASHCARD_SET_PRIVACY_REQUIRED(2204, "Privacy must not be null", HttpStatus.BAD_REQUEST),
 
     // ==========================
+    // FLASHCARD
+    // ==========================
+    FLASHCARD_NOT_EXISTED(2400, "Flashcard not found", HttpStatus.NOT_FOUND),
+
+    // ==========================
     // COMMENT
     // ==========================
     COMMENT_NOT_FOUND(2300, "Comment not found", HttpStatus.NOT_FOUND),

@@ -1,9 +1,12 @@
 package com.estudy.backend.service;
 
 import com.estudy.backend.dto.request.AnswerRequest;
-import com.estudy.backend.dto.request.StartSessionRequest;
-import com.estudy.backend.dto.response.*;
-import com.estudy.backend.entity.*;
+import com.estudy.backend.dto.response.StudySetItemResponse;
+import com.estudy.backend.dto.response.StudyTodayResponse;
+import com.estudy.backend.entity.FlashCard;
+import com.estudy.backend.entity.FlashCardSet;
+import com.estudy.backend.entity.StudyRecord;
+import com.estudy.backend.entity.User;
 import com.estudy.backend.exception.AppException;
 import com.estudy.backend.exception.ErrorCode;
 import com.estudy.backend.repository.*;
@@ -14,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,8 +36,11 @@ public class StudyService {
         UUID userId = getCurrentUserId();
         LocalDate today = LocalDate.now();
 
-        List<StudyRecord> dueRecords = studyRecordRepository.findDueToday(userId, today);
-        List<FlashCard>   newCards   = flashCardRepository.findNewCardsByUserId(userId);
+        List<StudyRecord> dueRecords =
+                studyRecordRepository.findDueToday(userId, today);
+
+        List<FlashCard> newCards =
+                flashCardRepository.findNewCardsByUserId(userId);
 
         Map<UUID, List<StudyRecord>> dueBySet = dueRecords.stream()
                 .collect(Collectors.groupingBy(sr -> sr.getFlashcard().getFlashCardSet().getId()));
@@ -67,13 +72,8 @@ public class StudyService {
         if (cards.isEmpty())
             cards = flashCardRepository.findByFlashCardSetIdAndDeletedFalse(set.getId());
 
-        QuizSession session = quizSessionRepository.save(QuizSession.builder()
-                .user(user)
-                .flashcardSet(set)
-                .mode(req.getMode())
-                .totalQuestions(cards.size())
-                .startedAt(LocalDateTime.now())
-                .build());
+        List<StudySetItemResponse> dueSets = buildDueItems(dueBySet);
+        List<StudySetItemResponse> newSets  = buildNewItems(newBySet);
 
         return StartSessionResponse.builder()
                 .sessionId(session.getId().toString())
@@ -84,145 +84,108 @@ public class StudyService {
                 .build();
     }
 
-    // ── UC-STUDY-02~05: Submit answer ──
+    // ── UC-STUDY-02: Ghi nhận kết quả trả lời + cập nhật SM-2 ─────
     @Transactional
-    public void submitAnswer(AnswerRequest req) {
+    public void submitAnswer(AnswerRequest request) {
         UUID userId = getCurrentUserId();
-        User user   = getUser(userId);
+        User user = userRepository.findByUsernameAndDeletedFalse(
+                SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        QuizSession session = quizSessionRepository.findById(req.getSessionId())
-                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
-        FlashCard card = flashCardRepository.findById(req.getFlashcardId())
-                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+        UUID flashcardId = UUID.fromString(request.getFlashcardId());
+        FlashCard flashcard = flashCardRepository.findById(flashcardId)
+                .orElseThrow(() -> new AppException(ErrorCode.FLASHCARD_NOT_EXISTED));
 
+        boolean correct = Boolean.TRUE.equals(request.getCorrect());
+
+        // Tìm hoặc tạo StudyRecord
         StudyRecord record = studyRecordRepository
-                .findByUserIdAndFlashcardId(userId, card.getId())
-                .orElse(StudyRecord.builder().user(user).flashcard(card).build());
+                .findByUserIdAndFlashcardId(userId, flashcardId)
+                .orElse(StudyRecord.builder()
+                        .user(user)
+                        .flashcard(flashcard)
+                        .build());
 
-        boolean correct = determineCorrect(session.getMode(), req);
-
-        if (correct) {
-            record.setCorrectCount(record.getCorrectCount() + 1);
-            if ("flashcard".equals(session.getMode()))
-                record.setRemembered(Boolean.TRUE.equals(req.getRemembered()));
-        } else {
-            record.setWrongCount(record.getWrongCount() + 1);
-            if ("flashcard".equals(session.getMode()))
-                record.setRemembered(false);
-        }
-
+        // Áp dụng thuật toán SM-2
         applySM2(record, correct);
-        record.setLastStudiedAt(LocalDateTime.now());
+
         studyRecordRepository.save(record);
     }
 
-    // ── UC-STUDY-02~05: End session ──
-    @Transactional
-    public SessionResultResponse endSession(UUID sessionId, List<String> wrongTerms) {
-        UUID userId = getCurrentUserId();
+    // ── SM-2 Algorithm ──────────────────────────────────────────────
+    private void applySM2(StudyRecord record, boolean correct) {
+        // Quality: 4 = correct, 0 = wrong (simplified)
+        int quality = correct ? 4 : 0;
 
-        QuizSession session = quizSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+        float ef = record.getEaseFactor() != null ? record.getEaseFactor() : 2.5f;
+        int interval = record.getIntervalDays() != null ? record.getIntervalDays() : 1;
+        int rep = record.getRepetitionCount() != null ? record.getRepetitionCount() : 0;
 
-        LocalDateTime now = LocalDateTime.now();
-        session.setEndedAt(now);
-        int wrongCount = wrongTerms != null ? wrongTerms.size() : 0;
-        int correct    = session.getTotalQuestions() - wrongCount;
-        session.setCorrectCount(correct);
-        quizSessionRepository.save(session);
+        if (quality < 3) {
+            // Wrong: reset repetition
+            rep = 0;
+            interval = 1;
+        } else {
+            // Correct: update EF and interval
+            ef += 0.1f - (5 - quality) * (0.08f + (5 - quality) * 0.02f);
+            ef = Math.max(1.3f, ef);
 
-        // UC-STUDY-06: streak
-        User user = getUser(userId);
-        int[] streak = updateStreak(user);
-        userRepository.save(user);
-
-        int duration = (int) ChronoUnit.SECONDS.between(session.getStartedAt(), now);
-
-        return SessionResultResponse.builder()
-                .sessionId(sessionId.toString())
-                .mode(session.getMode())
-                .correctCount(correct)
-                .totalQuestions(session.getTotalQuestions())
-                .durationSeconds(duration)
-                .currentStreak(streak[0])
-                .isNewRecord(streak[1] == 1)
-                .wrongTerms(wrongTerms != null ? wrongTerms : List.of())
-                .build();
-    }
-
-    // ── UC-STAT-01,02,03: Summary ──
-    public StatSummaryResponse getStatSummary() {
-        UUID userId = getCurrentUserId();
-        User user   = getUser(userId);
-
-        long learned  = studyRecordRepository.countByUserId(userId);
-        long mastered = studyRecordRepository.countByUserIdAndRememberedTrue(userId);
-
-        Object[] acc   = studyRecordRepository.sumAccuracy(userId);
-        long totalAns  = acc[0] != null ? ((Number) acc[0]).longValue() : 0;
-        long wrongAns  = acc[1] != null ? ((Number) acc[1]).longValue() : 0;
-        double accuracy = totalAns > 0
-                ? Math.round((totalAns - wrongAns) * 1000.0 / totalAns) / 10.0 : 0.0;
-
-        return StatSummaryResponse.builder()
-                .wordsLearned((int) learned).wordsMastered((int) mastered)
-                .totalAnswers(totalAns).wrongAnswers(wrongAns).accuracyPercent(accuracy)
-                .currentStreak(user.getCurrentStreak()).longestStreak(user.getLongestStreak())
-                .isNewRecord(user.getCurrentStreak() > 0
-                        && user.getCurrentStreak().equals(user.getLongestStreak()))
-                .build();
-    }
-
-    // ── UC-STAT-04,05: Activity ──
-    public List<DayActivityResponse> getStudyActivity(String period) {
-        UUID userId = getCurrentUserId();
-        int days = "monthly".equals(period) ? 30 : 7;
-        LocalDateTime from = LocalDateTime.now().minusDays(days).toLocalDate().atStartOfDay();
-
-        List<QuizSession> sessions = quizSessionRepository.findCompletedSessions(userId, from);
-        Map<String, List<QuizSession>> byDate = sessions.stream().collect(
-                Collectors.groupingBy(s -> s.getStartedAt().toLocalDate()
-                        .format(DateTimeFormatter.ISO_LOCAL_DATE)));
-
-        List<DayActivityResponse> result = new ArrayList<>();
-        for (int i = days - 1; i >= 0; i--) {
-            String dateStr = LocalDate.now().minusDays(i).format(DateTimeFormatter.ISO_LOCAL_DATE);
-            List<QuizSession> day = byDate.getOrDefault(dateStr, List.of());
-            int wc = day.stream().mapToInt(QuizSession::getTotalQuestions).sum();
-            int tq = day.stream().mapToInt(QuizSession::getTotalQuestions).sum();
-            int cq = day.stream().mapToInt(QuizSession::getCorrectCount).sum();
-            double acc = tq > 0 ? Math.round(cq * 1000.0 / tq) / 10.0 : 0.0;
-            result.add(DayActivityResponse.builder().date(dateStr).wordCount(wc).accuracyPercent(acc).build());
+            if (rep == 0) {
+                interval = 1;
+            } else if (rep == 1) {
+                interval = 6;
+            } else {
+                interval = Math.round(interval * ef);
+            }
+            rep += 1;
         }
-        return result;
+
+        record.setEaseFactor(ef);
+        record.setIntervalDays(interval);
+        record.setRepetitionCount(rep);
+        record.setNextReviewAt(LocalDate.now().plusDays(interval));
+        record.setLastStudiedAt(LocalDateTime.now());
+        record.setRemembered(correct);
+
+        if (correct) {
+            record.setCorrectCount((record.getCorrectCount() != null ? record.getCorrectCount() : 0) + 1);
+        } else {
+            record.setWrongCount((record.getWrongCount() != null ? record.getWrongCount() : 0) + 1);
+        }
     }
 
-    // ── UC-STAT-06: Set Progress ──
-    public List<SetProgressResponse> getSetProgress() {
-        UUID userId = getCurrentUserId();
-        List<FlashCardSet> sets = flashCardSetRepository.findAllByUserIdAndDeletedFalse(userId);
+    // ── Helpers ─────────────────────────────────────────────────────
+    private List<StudySetItemResponse> buildDueItems(Map<UUID, List<StudyRecord>> map) {
+        return map.entrySet().stream()
+                .map(e -> {
+                    List<StudyRecord> records = e.getValue();
+                    FlashCardSet set = records.get(0).getFlashcard().getFlashCardSet();
 
-        return sets.stream().map(set -> {
-                    List<FlashCard> cards = set.getFlashCards().stream()
-                            .filter(f -> !Boolean.TRUE.equals(f.getDeleted())).collect(Collectors.toList());
-                    if (cards.isEmpty()) return null;
+                    List<String> preview = records.stream()
+                            .limit(3)
+                            .map(sr -> sr.getFlashcard().getTerm())
+                            .collect(Collectors.toList());
 
-                    int remembered = 0, notYet = 0, notStudied = 0;
-                    for (FlashCard fc : cards) {
-                        Optional<StudyRecord> sr =
-                                studyRecordRepository.findByUserIdAndFlashcardId(userId, fc.getId());
-                        if (sr.isEmpty()) notStudied++;
-                        else if (Boolean.TRUE.equals(sr.get().getRemembered())) remembered++;
-                        else notYet++;
-                    }
-                    double pct = Math.round(remembered * 1000.0 / cards.size()) / 10.0;
+                    long remembered = records.stream()
+                            .filter(sr -> Boolean.TRUE.equals(sr.getRemembered()))
+                            .count();
 
-                    return SetProgressResponse.builder()
-                            .setId(set.getId().toString()).setName(set.getName())
-                            .totalWords(cards.size()).rememberedCount(remembered)
-                            .notYetCount(notYet).notStudiedCount(notStudied).percentage(pct).build();
-                }).filter(Objects::nonNull)
-                .sorted(Comparator.comparingDouble(SetProgressResponse::getPercentage).reversed())
+                    String lastReviewed = records.stream()
+                            .map(StudyRecord::getLastStudiedAt)
+                            .filter(Objects::nonNull)
+                            .max(Comparator.naturalOrder())
+                            .map(dt -> formatDate(dt.toLocalDate()))
+                            .orElse("Never studied");
+
+                    int totalWords = (int) set.getFlashCards().stream()
+                            .filter(f -> !Boolean.TRUE.equals(f.getDeleted()))
+                            .count();
+
+                    return new StudySetItemResponse(
+                            set.getId().toString(), set.getName(),
+                            records.size(), totalWords,
+                            (int) remembered, lastReviewed, preview);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -326,10 +289,11 @@ public class StudyService {
         return days + " days ago";
     }
 
-    private UUID getCurrentUserId() { return getUser(
-            SecurityContextHolder.getContext().getAuthentication().getName()).getId(); }
-    private User getUser(UUID id) { return userRepository.findById(id)
-            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)); }
-    private User getUser(String username) { return userRepository.findByUsernameAndDeletedFalse(username)
-            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)); }
+    private UUID getCurrentUserId() {
+        String username = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        return userRepository.findByUsernameAndDeletedFalse(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED))
+                .getId();
+    }
 }

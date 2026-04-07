@@ -45,23 +45,25 @@
                 android:maxLines="1"
                 android:ellipsize="end" />
 
-            <!-- Số từ due/new -->
+            <!-- Số từ due/new (color set in adapter: red=due, blue=new) -->
             <TextView
                 android:id="@+id/tvWordCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10 words"
                 android:textSize="11sp"
-                android:textColor="#94a3b8"
-                android:layout_marginEnd="4dp" />
+                android:textStyle="bold"
+                android:textColor="@color/status_due"
+                android:layout_marginEnd="6dp" />
 
             <!-- Arrow → -->
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:id="@+id/btnArrow"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:src="@drawable/ic_arrow_down"
                 android:rotation="-90"
-                android:tint="#94a3b8" />
+                android:tint="@color/primary" />
         </LinearLayout>
 
         <!-- ── Row 2: subtitle (last reviewed) ─────────────────── -->

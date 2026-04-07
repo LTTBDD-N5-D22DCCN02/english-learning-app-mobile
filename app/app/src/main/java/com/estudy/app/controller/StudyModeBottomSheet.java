@@ -8,10 +8,8 @@ import com.estudy.app.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 /**
- * Bottom sheet chọn chế độ học (UC-STUDY-02~05).
- * Gọi từ StudyTodayActivity:
- *   StudyModeBottomSheet.newInstance(setId, setName)
- *       .show(getSupportFragmentManager(), "StudyMode");
+ * Bottom sheet dialog cho phép user chọn chế độ học.
+ * Gọi từ StudyTodayActivity hoặc StudySetWordsActivity.
  */
 public class StudyModeBottomSheet extends BottomSheetDialogFragment {
 
@@ -47,7 +45,6 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
             setName = getArguments().getString(ARG_SET_NAME, "");
         }
 
-        // Subtitle: tên bộ
         TextView tvSetName = view.findViewById(R.id.tvSetName);
         if (tvSetName != null) tvSetName.setText(setName);
 
@@ -58,7 +55,6 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
         Button    btnStart = view.findViewById(R.id.btnStart);
         ImageButton btnClose = view.findViewById(R.id.btnClose);
 
-        // Mặc định chọn Flashcard
         selectMode("flashcard");
 
         optFlashcard.setOnClickListener(v -> selectMode("flashcard"));
@@ -66,60 +62,74 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
         optMatch.setOnClickListener(v     -> selectMode("match"));
         optSpelling.setOnClickListener(v  -> selectMode("spelling"));
 
-        if (btnStart != null) btnStart.setOnClickListener(v -> startStudy());
+        btnStart.setOnClickListener(v -> startStudy());
         if (btnClose != null) btnClose.setOnClickListener(v -> dismiss());
     }
 
     private void selectMode(String mode) {
         selectedMode = mode;
-        setModeBackground(optFlashcard, "flashcard".equals(mode));
-        setModeBackground(optWordQuiz,  "word_quiz".equals(mode));
-        setModeBackground(optMatch,     "match".equals(mode));
-        setModeBackground(optSpelling,  "spelling".equals(mode));
+
+        resetBackground(optFlashcard);
+        resetBackground(optWordQuiz);
+        resetBackground(optMatch);
+        resetBackground(optSpelling);
+
+        switch (mode) {
+            case "flashcard": highlightMode(optFlashcard); break;
+            case "word_quiz": highlightMode(optWordQuiz);  break;
+            case "match":     highlightMode(optMatch);     break;
+            case "spelling":  highlightMode(optSpelling);  break;
+        }
     }
 
-    private void setModeBackground(LinearLayout view, boolean selected) {
+    private void highlightMode(LinearLayout view) {
         if (view == null) return;
-        if (selected) {
-            view.setBackgroundResource(R.drawable.bg_mode_selected);
-            TextView tv = (TextView) view.getChildAt(0);
-            if (tv != null) tv.setTypeface(null, android.graphics.Typeface.BOLD);
-        } else {
-            view.setBackgroundResource(android.R.color.transparent);
-            TextView tv = (TextView) view.getChildAt(0);
-            if (tv != null) tv.setTypeface(null, android.graphics.Typeface.NORMAL);
+        view.setBackgroundResource(R.drawable.bg_mode_selected);
+        setChildTextBold(view, true);
+    }
+
+    private void resetBackground(LinearLayout view) {
+        if (view == null) return;
+        view.setBackgroundResource(android.R.color.transparent);
+        setChildTextBold(view, false);
+    }
+
+    private void setChildTextBold(LinearLayout view, boolean bold) {
+        if (view == null || view.getChildCount() == 0) return;
+        View child = view.getChildAt(0);
+        if (child instanceof TextView) {
+            ((TextView) child).setTypeface(null,
+                    bold ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
         }
     }
 
     private void startStudy() {
         if (setId == null || setId.isEmpty()) {
-            Toast.makeText(getContext(),
-                    "Vui lòng chọn một bộ từ vựng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Vui lòng chọn một bộ flashcard cụ thể", Toast.LENGTH_SHORT).show();
             return;
         }
         dismiss();
 
         Intent intent;
         switch (selectedMode) {
-            case "word_quiz":
-                intent = new Intent(getActivity(), WordQuizActivity.class);
-                intent.putExtra(WordQuizActivity.EXTRA_SET_ID,   setId);
-                intent.putExtra(WordQuizActivity.EXTRA_SET_NAME, setName);
-                break;
-            case "match":
-                intent = new Intent(getActivity(), MatchPairActivity.class);
-                intent.putExtra(MatchPairActivity.EXTRA_SET_ID,   setId);
-                intent.putExtra(MatchPairActivity.EXTRA_SET_NAME, setName);
-                break;
             case "spelling":
                 intent = new Intent(getActivity(), SpellingActivity.class);
-                intent.putExtra(SpellingActivity.EXTRA_SET_ID,   setId);
+                intent.putExtra(SpellingActivity.EXTRA_SET_ID, setId);
                 intent.putExtra(SpellingActivity.EXTRA_SET_NAME, setName);
+                startActivity(intent);
                 break;
-            default: // flashcard
-                intent = new Intent(getActivity(), FlashcardStudyActivity.class);
-                intent.putExtra(FlashcardStudyActivity.EXTRA_SET_ID,   setId);
-                intent.putExtra(FlashcardStudyActivity.EXTRA_SET_NAME, setName);
+            case "match":
+                intent = new Intent(getActivity(), MatchActivity.class);
+                intent.putExtra(MatchActivity.EXTRA_SET_ID, setId);
+                intent.putExtra(MatchActivity.EXTRA_SET_NAME, setName);
+                startActivity(intent);
+                break;
+            case "word_quiz":
+                Toast.makeText(getContext(), "Word Quiz — coming soon!", Toast.LENGTH_SHORT).show();
+                break;
+            case "flashcard":
+            default:
+                Toast.makeText(getContext(), "Flashcard — coming soon!", Toast.LENGTH_SHORT).show();
                 break;
         }
         startActivity(intent);
