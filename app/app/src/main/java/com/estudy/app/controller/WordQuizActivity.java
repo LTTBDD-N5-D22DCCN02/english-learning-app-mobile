@@ -25,6 +25,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -66,6 +67,12 @@ public class WordQuizActivity extends AppCompatActivity {
     // Options text (để kiểm tra đáp án đúng)
     private final String[] optionTexts = new String[4];
 
+    // Mode câu hỏi: true = EN→VI (hỏi term, đáp definition), false = VI→EN
+    private boolean isEnToVi = true;
+
+    // Label hướng dẫn
+    private TextView tvQuestionLabel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +106,7 @@ public class WordQuizActivity extends AppCompatActivity {
         tvTotalAnswered = findViewById(R.id.tvTotalAnswered);
         progressBar     = findViewById(R.id.progressBar);
 
+        tvQuestionLabel = findViewById(R.id.tvQuestionLabel);
         tvQuestion    = findViewById(R.id.tvQuestion);
         tvQuestionIpa = findViewById(R.id.tvQuestionIpa);
         btnPlayAudio  = findViewById(R.id.btnPlayAudio);
@@ -193,22 +201,60 @@ public class WordQuizActivity extends AppCompatActivity {
         // Di chuyển badge theo thanh progress
         moveBadgeToProgress(index + 1, total);
 
-        // Question
-        if (tvQuestion != null)    tvQuestion.setText(card.getTerm() != null ? card.getTerm() : "");
-        if (tvQuestionIpa != null) tvQuestionIpa.setText(card.getIpa() != null ? card.getIpa() : "");
+        // Random EN→VI hoặc VI→EN mỗi câu
+        isEnToVi = new Random().nextBoolean();
 
-        // Audio
-        if (btnPlayAudio != null) btnPlayAudio.setOnClickListener(v -> speakTerm(card.getTerm()));
+        String term = card.getTerm() != null ? card.getTerm() : "";
+        String def  = card.getDefinition() != null ? card.getDefinition() : "";
+        String ipa  = card.getIpa() != null ? card.getIpa() : "";
 
-        // Build options
-        List<String> options = new ArrayList<>();
-        String correctDef = card.getDefinition() != null ? card.getDefinition() : "";
-        options.add(correctDef);
-        List<String> distractors = card.getDistractors();
-        if (distractors != null) {
-            for (int i = 0; i < Math.min(3, distractors.size()); i++)
-                options.add(distractors.get(i));
+        if (isEnToVi) {
+            // Hỏi: từ tiếng Anh → chọn nghĩa tiếng Việt
+            if (tvQuestionLabel != null) tvQuestionLabel.setText("Choose the correct meaning");
+            if (tvQuestion != null)    tvQuestion.setText(term);
+            if (tvQuestionIpa != null) tvQuestionIpa.setText(ipa);
+            if (tvQuestionIpa != null) tvQuestionIpa.setVisibility(android.view.View.VISIBLE);
+        } else {
+            // Hỏi: nghĩa tiếng Việt → chọn từ tiếng Anh
+            if (tvQuestionLabel != null) tvQuestionLabel.setText("Choose the correct word");
+            if (tvQuestion != null)    tvQuestion.setText(def);
+            if (tvQuestionIpa != null) tvQuestionIpa.setVisibility(android.view.View.GONE);
         }
+
+        // Audio (luôn đọc term tiếng Anh)
+        if (btnPlayAudio != null) btnPlayAudio.setOnClickListener(v -> speakTerm(term));
+
+        // Build options: nếu EN→VI thì đáp án là definition, VI→EN thì đáp án là term
+        List<String> options = new ArrayList<>();
+        String correctAnswer;
+
+        if (isEnToVi) {
+            // Đáp án đúng = definition
+            correctAnswer = def;
+            options.add(correctAnswer);
+            List<String> distractors = card.getDistractors();
+            if (distractors != null) {
+                for (int i = 0; i < Math.min(3, distractors.size()); i++)
+                    options.add(distractors.get(i));
+            }
+        } else {
+            // Đáp án đúng = term tiếng Anh
+            // Distractors = term của các card khác trong batch
+            correctAnswer = term;
+            options.add(correctAnswer);
+            // Lấy term ngẫu nhiên từ các card khác làm distractor
+            List<String> otherTerms = new ArrayList<>();
+            for (SessionCardResponse other : cards) {
+                if (!other.getFlashcardId().equals(card.getFlashcardId())
+                        && other.getTerm() != null) {
+                    otherTerms.add(other.getTerm());
+                }
+            }
+            Collections.shuffle(otherTerms);
+            for (int i = 0; i < Math.min(3, otherTerms.size()); i++)
+                options.add(otherTerms.get(i));
+        }
+
         while (options.size() < 4) options.add("—");
         Collections.shuffle(options);
 
@@ -232,8 +278,11 @@ public class WordQuizActivity extends AppCompatActivity {
         setOptionsEnabled(false);
 
         SessionCardResponse card = cards.get(currentIndex);
-        String correctDef = card.getDefinition() != null ? card.getDefinition() : "";
-        boolean isCorrect = correctDef.equals(optionTexts[selectedIdx]);
+        // Đáp án đúng tùy mode
+        String correctAnswer = isEnToVi
+                ? (card.getDefinition() != null ? card.getDefinition() : "")
+                : (card.getTerm() != null ? card.getTerm() : "");
+        boolean isCorrect = correctAnswer.equals(optionTexts[selectedIdx]);
 
         totalAnswered++;
         if (!isCorrect) {
@@ -247,11 +296,9 @@ public class WordQuizActivity extends AppCompatActivity {
         TextView[] labels   = {tvLabel1, tvLabel2, tvLabel3, tvLabel4};
 
         for (int i = 0; i < 4; i++) {
-            if (correctDef.equals(optionTexts[i])) {
-                // Đáp án đúng → green
+            if (correctAnswer.equals(optionTexts[i])) {
                 setOptionStyle(opts[i], labels[i], "correct");
             } else if (i == selectedIdx && !isCorrect) {
-                // Người dùng chọn sai → red
                 setOptionStyle(opts[i], labels[i], "wrong");
             }
         }
