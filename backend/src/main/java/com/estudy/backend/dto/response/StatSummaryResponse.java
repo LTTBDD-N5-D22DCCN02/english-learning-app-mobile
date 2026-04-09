@@ -1,5 +1,6 @@
 package com.estudy.backend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -22,5 +23,6 @@ public class StatSummaryResponse {
     // UC-STAT-03: Study Streak
     int currentStreak;
     int longestStreak;
-    boolean isNewRecord;
+    @JsonProperty("isNewRecord")
+    boolean newRecord;
 }

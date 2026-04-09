@@ -11,11 +11,10 @@
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:pathData="M1,12s4,-8 11,-8 11,8 11,8 -4,8 -11,8 -11,-8 -11,-8z"/>
-    <circle
+    <!-- circle cx=12 cy=12 r=3 converted to path -->
+    <path
         android:fillColor="@android:color/transparent"
         android:strokeColor="#94A3B8"
         android:strokeWidth="2"
-        android:cx="12"
-        android:cy="12"
-        android:r="3"/>
+        android:pathData="M9,12 A3,3 0 1,0 15,12 A3,3 0 1,0 9,12 Z"/>
 </vector>

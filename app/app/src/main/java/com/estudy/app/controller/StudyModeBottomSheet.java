@@ -119,19 +119,24 @@ public class StudyModeBottomSheet extends BottomSheetDialogFragment {
                 startActivity(intent);
                 break;
             case "match":
-                intent = new Intent(getActivity(), MatchActivity.class);
-                intent.putExtra(MatchActivity.EXTRA_SET_ID, setId);
-                intent.putExtra(MatchActivity.EXTRA_SET_NAME, setName);
+                intent = new Intent(getActivity(), MatchPairActivity.class);
+                intent.putExtra(MatchPairActivity.EXTRA_SET_ID, setId);
+                intent.putExtra(MatchPairActivity.EXTRA_SET_NAME, setName);
                 startActivity(intent);
                 break;
             case "word_quiz":
-                Toast.makeText(getContext(), "Word Quiz — coming soon!", Toast.LENGTH_SHORT).show();
+                intent = new Intent(getActivity(), WordQuizActivity.class);
+                intent.putExtra(WordQuizActivity.EXTRA_SET_ID, setId);
+                intent.putExtra(WordQuizActivity.EXTRA_SET_NAME, setName);
+                startActivity(intent);
                 break;
             case "flashcard":
             default:
-                Toast.makeText(getContext(), "Flashcard — coming soon!", Toast.LENGTH_SHORT).show();
+                intent = new Intent(getActivity(), FlashcardStudyActivity.class);
+                intent.putExtra(FlashcardStudyActivity.EXTRA_SET_ID, setId);
+                intent.putExtra(FlashcardStudyActivity.EXTRA_SET_NAME, setName);
+                startActivity(intent);
                 break;
         }
-        startActivity(intent);
     }
 }

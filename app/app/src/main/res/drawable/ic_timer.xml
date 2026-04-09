@@ -10,13 +10,12 @@
         android:strokeWidth="2"
         android:strokeLineCap="round"
         android:pathData="M12,6v6l4,2"/>
-    <circle
+    <!-- circle cx=12 cy=12 r=9 converted to path -->
+    <path
         android:fillColor="@android:color/transparent"
         android:strokeColor="#EF4444"
         android:strokeWidth="2"
-        android:cx="12"
-        android:cy="12"
-        android:r="9"/>
+        android:pathData="M3,12 A9,9 0 1,0 21,12 A9,9 0 1,0 3,12 Z"/>
     <path
         android:fillColor="@android:color/transparent"
         android:strokeColor="#EF4444"

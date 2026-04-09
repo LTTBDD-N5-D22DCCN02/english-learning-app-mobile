@@ -1,15 +1,8 @@
 package com.estudy.backend.exception;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
-@Getter
-@AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public enum ErrorCode {
 
     // ==========================
@@ -80,7 +73,17 @@ public enum ErrorCode {
     COMMENT_CONTENT_INVALID(2303, "Comment content must not exceed 1000 characters", HttpStatus.BAD_REQUEST),
     ;
 
-    int code;
-    String message;
-    HttpStatusCode statusCode;
+    private final int code;
+    private final String message;
+    private final HttpStatusCode statusCode;
+
+    ErrorCode(int code, String message, HttpStatusCode statusCode) {
+        this.code = code;
+        this.message = message;
+        this.statusCode = statusCode;
+    }
+
+    public int getCode() { return code; }
+    public String getMessage() { return message; }
+    public HttpStatusCode getStatusCode() { return statusCode; }
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class AnswerRequest {
     private String flashcardId;
-    private String setId;
-    private String mode;    // "flashcard" | "spelling" | "match" | "word_quiz"
-    private Boolean correct;
+    private String sessionId;
+    private Boolean remembered;  // cho flashcard mode
+    private Boolean correct;     // cho quiz / word_quiz mode
 }

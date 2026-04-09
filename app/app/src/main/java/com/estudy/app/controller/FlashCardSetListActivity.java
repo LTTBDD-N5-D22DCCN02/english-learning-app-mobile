@@ -85,7 +85,7 @@ public class FlashCardSetListActivity extends AppCompatActivity {
         FlashCardSetAdapter adapter = new FlashCardSetAdapter(flashCardSetList,
                 // onClick item -> detail
                 item -> {
-                    Intent intent = new Intent(this, FlashCardSetDetailActivity.class);
+                    Intent intent = new Intent(this, FlashCardSetOverviewActivity.class);
                     intent.putExtra("flashcard_set_id", item.getId());
                     intent.putExtra("flashcard_set_name", item.getName());
                     startActivity(intent);

@@ -59,6 +59,9 @@ public interface ApiService {
             @Path("flashCardSetId") String flashCardSetId,
             @Body CommentRequest request);
 
+    @DELETE("flashcards/{id}")
+    Call<ApiResponse<Void>> deleteFlashCard(@Path("id") String id);
+
     @DELETE("flashcard-sets/comments/{commentId}")
     Call<ApiResponse<Void>> deleteComment(@Path("commentId") String commentId);
 
@@ -66,58 +69,31 @@ public interface ApiService {
     @GET("study/today")
     Call<ApiResponse<StudyTodayResponse>> getStudyToday();
 
-    // ── Submit Answer (SM-2 update)
+    // ── UC-STUDY-02~05: Start session ─────────────────────────────────
+    @POST("study/session/start")
+    Call<ApiResponse<StartSessionResponse>> startSession(@Body StartSessionRequest request);
+
+    // ── UC-STUDY-06: End session + update streak ──────────────────────
+    @PUT("study/session/{sessionId}/end")
+    Call<ApiResponse<SessionResultResponse>> endSession(
+            @Path("sessionId") String sessionId,
+            @Body List<String> wrongTerms);
+
+    // ── Submit Answer (cập nhật StudyRecord + SM-2) ───────────────────
     @POST("study/answer")
     Call<ApiResponse<Void>> submitAnswer(@Body AnswerRequest request);
 
-    // ── Quiz Session
-//    @POST("study/session/start")
-//    Call<ApiResponse<QuizSessionResponse>> startSession(@Body StartSessionRequest request);
-//
-//    @PUT("study/session/{sessionId}/end")
-//    Call<ApiResponse<Void>> endSession(@Path("sessionId") String sessionId,
-//                                       @Body EndSessionRequest request);
-//
-//    // ── Answer card (cập nhật StudyRecord + SM-2) ────────────────
-//    @POST("study/answer")
-//    Call<ApiResponse<Void>> submitAnswer(@Body AnswerRequest request);
+    // ── UC-STAT-01,02,03: Statistics Summary ──────────────────────────
+    @GET("study/stats/summary")
+    Call<ApiResponse<StatSummaryResponse>> getStatSummary();
 
-    // ── Statistics ────────────────────────────────────────────────
-//    @GET("study/stats/summary")
-//    Call<ApiResponse<StatSummaryResponse>> getStatSummary();
-//
-//    @GET("study/stats/activity")
-//    Call<ApiResponse<List<DayActivityResponse>>> getStudyActivity(
-//            @Query("period") String period // "weekly" | "monthly"
-//    );
-//
-//    @GET("study/stats/sets")
-//    Call<ApiResponse<List<SetProgressResponse>>> getSetProgress();
+    // ── UC-STAT-04,05: Study Activity chart ───────────────────────────
+    @GET("study/stats/activity")
+    Call<ApiResponse<List<DayActivityResponse>>> getStudyActivity(
+            @Query("period") String period  // "weekly" | "monthly"
+    );
 
-
-// ── Request/Response models cần tạo thêm ─────────────────────────
-
-// StartSessionRequest.java
-// {
-//   "setId": "uuid",
-//   "mode": "flashcard" | "word_quiz" | "match" | "spelling"
-// }
-
-// AnswerRequest.java
-// {
-//   "flashcardId": "uuid",
-//   "sessionId":   "uuid",
-//   "remembered":  true | false   // cho flashcard mode
-//   "correct":     true | false   // cho quiz mode
-// }
-
-// QuizSessionResponse.java — trả về sessionId để track phiên học
-
-// StatSummaryResponse.java — { wordsLearned, wordsMastered, correctCount,
-//                               wrongCount, currentStreak, longestStreak }
-
-// DayActivityResponse.java — { date, rememberedCount, notYetCount }
-
-// SetProgressResponse.java — { setId, setName, totalWords,
-//                              rememberedCount, percentage }
+    // ── UC-STAT-06: Set Progress ──────────────────────────────────────
+    @GET("study/stats/sets")
+    Call<ApiResponse<List<SetProgressResponse>>> getSetProgress();
 }

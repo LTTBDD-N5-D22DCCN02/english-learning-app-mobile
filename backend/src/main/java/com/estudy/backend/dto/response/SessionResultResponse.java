@@ -1,5 +1,6 @@
 package com.estudy.backend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -20,7 +21,8 @@ public class SessionResultResponse {
 
     /** Streak sau phiên học */
     int currentStreak;
-    boolean isNewRecord;
+    @JsonProperty("isNewRecord")
+    boolean newRecord;
 
     /** Danh sách từ trả lời sai để hiển thị màn hình kết quả */
     List<String> wrongTerms;

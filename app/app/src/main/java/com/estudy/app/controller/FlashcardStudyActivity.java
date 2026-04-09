@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.text.TextUtils;
 import android.view.*;
 import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.Locale;
 import com.estudy.app.R;
@@ -33,20 +36,39 @@ public class FlashcardStudyActivity extends AppCompatActivity {
     public static final String EXTRA_SET_ID   = "set_id";
     public static final String EXTRA_SET_NAME = "set_name";
 
-    private TextView  tvProgress, tvCardFront, tvCardIPA, tvCardBack, tvExample, tvTapHint;
-    private View      cardFlashcard;
-    private Button    btnForgot, btnRemembered, btnPlayAudio;
+    private TextView    tvProgress;
     private ProgressBar progressBar;
-    private View      layoutBack;
+    private TextView    tvForgotBadge, tvRememberedBadge;
+
+    private View        cardFlashcard;
+    private View        layoutFront, layoutBack;
+    private TextView    tvCardFront, tvCardIPA, tvTapHint;
+    private TextView    tvCardBackTerm, tvCardBackIPA, tvCardBack, tvExample;
+    private ImageView   ivCardImage;
+    private ImageButton btnPlayAudio, btnPlayAudioBack;
+
+    private View overlayForgot, overlayRemembered;
+
+    private MaterialButton btnForgot, btnRemembered, btnViewDetails;
 
     private ApiService apiService;
     private String sessionId;
     private List<SessionCardResponse> cards = new ArrayList<>();
-    private int currentIndex = 0;
-    private boolean isFlipped = false;
+    private int currentIndex    = 0;
+    private boolean isFlipped   = false;
+    private int forgotCount     = 0;
+    private int rememberedCount = 0;
     private final List<String> wrongTerms = new ArrayList<>();
 
     private TextToSpeech tts;
+
+    // Swipe tracking
+    private float swipeStartX = 0f;
+    private float swipeStartY = 0f;
+    private boolean isSwiping = false;          // true khi đã xác định là swipe ngang
+    private static final int SWIPE_COMMIT  = 160; // px để commit swipe
+    private static final int SWIPE_DETECT  = 12;  // px nhỏ nhất để xác định hướng
+    private static final float MAX_TILT    = 18f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,135 +78,312 @@ public class FlashcardStudyActivity extends AppCompatActivity {
         TokenManager tm = new TokenManager(this);
         apiService = ApiClient.getInstance(tm).create(ApiService.class);
 
-        // Init Text-To-Speech (tiếng Anh Mỹ)
         tts = new TextToSpeech(this, status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                tts.setLanguage(Locale.US);
-            }
+            if (status == TextToSpeech.SUCCESS) tts.setLanguage(Locale.US);
         });
 
         bindViews();
-
-        String setId   = getIntent().getStringExtra(EXTRA_SET_ID);
-        String setName = getIntent().getStringExtra(EXTRA_SET_NAME);
-
-        startSession(setId, setName);
+        startSession(getIntent().getStringExtra(EXTRA_SET_ID));
     }
 
     @Override
     protected void onDestroy() {
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
-        }
+        if (tts != null) { tts.stop(); tts.shutdown(); }
         super.onDestroy();
     }
 
     private void bindViews() {
-        tvProgress   = findViewById(R.id.tvProgress);
-        tvCardFront  = findViewById(R.id.tvCardFront);
-        tvCardIPA    = findViewById(R.id.tvCardIPA);
-        tvTapHint    = findViewById(R.id.tvTapHint);
-        cardFlashcard = findViewById(R.id.cardFlashcard);
-        progressBar  = findViewById(R.id.progressBar);
-        btnForgot     = findViewById(R.id.btnForgot);
-        btnRemembered = findViewById(R.id.btnRemembered);
-        btnPlayAudio  = findViewById(R.id.btnPlayAudio);
+        tvProgress        = findViewById(R.id.tvProgress);
+        progressBar       = findViewById(R.id.progressBar);
+        tvForgotBadge     = findViewById(R.id.tvForgotBadge);
+        tvRememberedBadge = findViewById(R.id.tvRememberedBadge);
 
-        // Back button
+        cardFlashcard  = findViewById(R.id.cardFlashcard);
+        layoutFront    = findViewById(R.id.layoutFront);
+        layoutBack     = findViewById(R.id.layoutBack);
+        tvCardFront    = findViewById(R.id.tvCardFront);
+        tvCardIPA      = findViewById(R.id.tvCardIPA);
+        tvTapHint      = findViewById(R.id.tvTapHint);
+        ivCardImage    = findViewById(R.id.ivCardImage);
+        tvCardBackTerm = findViewById(R.id.tvCardBackTerm);
+        tvCardBackIPA  = findViewById(R.id.tvCardBackIPA);
+        tvCardBack     = findViewById(R.id.tvCardBack);
+        tvExample      = findViewById(R.id.tvExample);
+        btnPlayAudio      = findViewById(R.id.btnPlayAudio);
+        btnPlayAudioBack  = findViewById(R.id.btnPlayAudioBack);
+        overlayForgot     = findViewById(R.id.overlayForgot);
+        overlayRemembered = findViewById(R.id.overlayRemembered);
+
+        btnForgot      = findViewById(R.id.btnForgot);
+        btnRemembered  = findViewById(R.id.btnRemembered);
+        btnViewDetails = findViewById(R.id.btnViewDetails);
+
         ImageButton btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> confirmExit());
+        ImageButton btnSettings = findViewById(R.id.btnSettings);
+        if (btnSettings != null) btnSettings.setOnClickListener(v -> showSettingsSheet());
 
-        ImageButton btnExit = findViewById(R.id.btnExit);
-        if (btnExit != null) btnExit.setOnClickListener(v -> confirmExit());
+        // ── Touch handler: phân biệt tap (flip) vs swipe (submit) ──
+        cardFlashcard.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
 
-        // Initially hide action buttons
-        btnForgot.setVisibility(View.GONE);
-        btnRemembered.setVisibility(View.GONE);
+                case MotionEvent.ACTION_DOWN:
+                    swipeStartX = event.getRawX();
+                    swipeStartY = event.getRawY();
+                    isSwiping   = false;
+                    // QUAN TRỌNG: return false để click event vẫn hoạt động
+                    return false;
 
-        // Tap card to flip
+                case MotionEvent.ACTION_MOVE: {
+                    float dx = event.getRawX() - swipeStartX;
+                    float dy = event.getRawY() - swipeStartY;
+
+                    if (!isSwiping) {
+                        // Chưa xác định hướng — chờ đủ ngưỡng
+                        if (Math.abs(dx) < SWIPE_DETECT && Math.abs(dy) < SWIPE_DETECT)
+                            return false; // chưa đủ → không can thiệp
+
+                        if (Math.abs(dx) >= Math.abs(dy) * 1.5f) {
+                            // Ngang rõ ràng → bắt đầu swipe mode
+                            isSwiping = true;
+                        } else {
+                            // Dọc → không phải swipe ngang, bỏ qua
+                            return false;
+                        }
+                    }
+
+                    // Đang swipe ngang — áp dụng tilt + translate
+                    float tilt = Math.max(-MAX_TILT, Math.min(MAX_TILT, (dx / 500f) * MAX_TILT));
+                    cardFlashcard.setRotation(tilt);
+                    cardFlashcard.setTranslationX(dx * 0.35f);
+
+                    float alpha = Math.min(1f, Math.abs(dx) / 300f);
+                    if (dx > 0) {
+                        if (overlayRemembered != null) overlayRemembered.setAlpha(alpha);
+                        if (overlayForgot != null)     overlayForgot.setAlpha(0f);
+                    } else {
+                        if (overlayForgot != null)     overlayForgot.setAlpha(alpha);
+                        if (overlayRemembered != null) overlayRemembered.setAlpha(0f);
+                    }
+                    // return true chỉ khi đang swipe, để ngăn scroll cha
+                    return true;
+                }
+
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL: {
+                    if (!isSwiping) {
+                        // Đây là TAP — để click listener xử lý, không làm gì
+                        isSwiping = false;
+                        return false;
+                    }
+                    // Đây là SWIPE
+                    isSwiping = false;
+                    float finalDx = event.getRawX() - swipeStartX;
+
+                    if (Math.abs(finalDx) >= SWIPE_COMMIT) {
+                        animateFlyAway(finalDx > 0);
+                    } else {
+                        snapBack();
+                    }
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        // Click để flip — hoạt động bình thường vì touch chỉ return true khi swipe
         cardFlashcard.setOnClickListener(v -> flipCard());
 
-        btnForgot.setOnClickListener(v    -> submitAnswer(false));
-        btnRemembered.setOnClickListener(v -> submitAnswer(true));
+        if (btnForgot != null)     btnForgot.setOnClickListener(v -> animateFlyAway(false));
+        if (btnRemembered != null) btnRemembered.setOnClickListener(v -> animateFlyAway(true));
+        if (btnViewDetails != null) btnViewDetails.setOnClickListener(v -> showCardDetails());
     }
 
-    private void startSession(String setId, String setName) {
+    // ── Snap back ─────────────────────────────────────────────
+    private void snapBack() {
+        cardFlashcard.animate().rotation(0f).translationX(0f).setDuration(200).start();
+        if (overlayForgot != null)     overlayForgot.setAlpha(0f);
+        if (overlayRemembered != null) overlayRemembered.setAlpha(0f);
+    }
+
+    // ── Fly away ──────────────────────────────────────────────
+    private void animateFlyAway(boolean remembered) {
+        if (overlayForgot != null)     overlayForgot.setAlpha(0f);
+        if (overlayRemembered != null) overlayRemembered.setAlpha(0f);
+
+        float targetX   = remembered ? 1200f : -1200f;
+        float targetRot = remembered ? 30f : -30f;
+
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(
+                ObjectAnimator.ofFloat(cardFlashcard, "translationX",
+                        cardFlashcard.getTranslationX(), targetX),
+                ObjectAnimator.ofFloat(cardFlashcard, "rotation",
+                        cardFlashcard.getRotation(), targetRot),
+                ObjectAnimator.ofFloat(cardFlashcard, "alpha", 1f, 0f)
+        );
+        set.setDuration(300);
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                cardFlashcard.setTranslationX(0f);
+                cardFlashcard.setRotation(0f);
+                cardFlashcard.setAlpha(1f);
+                submitAnswer(remembered);
+            }
+        });
+        set.start();
+    }
+
+    // ── Flip (tap) ─────────────────────────────────────────────
+    private void flipCard() {
+        flipTo(!isFlipped);
+    }
+
+    private void flipTo(boolean toBack) {
+        // Animation: rotationY (3D flip) — KHÔNG dùng rotation (2D tilt của swipe)
+        ObjectAnimator out = ObjectAnimator.ofFloat(cardFlashcard, "rotationY", 0f, 90f);
+        out.setDuration(150);
+        out.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                if (toBack) {
+                    layoutFront.setVisibility(View.GONE);
+                    layoutBack.setVisibility(View.VISIBLE);
+                    SessionCardResponse c = cards.get(currentIndex);
+                    if (tvCardBackTerm != null)
+                        tvCardBackTerm.setText(c.getTerm() != null ? c.getTerm() : "");
+                    if (tvCardBackIPA != null)
+                        tvCardBackIPA.setText(c.getIpa() != null ? c.getIpa() : "");
+                    if (tvCardBack != null)
+                        tvCardBack.setText(c.getDefinition() != null ? c.getDefinition() : "");
+                    if (tvExample != null)
+                        tvExample.setText(c.getExample() != null ? c.getExample() : "");
+                } else {
+                    layoutBack.setVisibility(View.GONE);
+                    layoutFront.setVisibility(View.VISIBLE);
+                    if (tvTapHint != null) tvTapHint.setVisibility(View.VISIBLE);
+                }
+                ObjectAnimator in = ObjectAnimator.ofFloat(cardFlashcard, "rotationY", -90f, 0f);
+                in.setDuration(150);
+                in.start();
+            }
+        });
+        out.start();
+        isFlipped = toBack;
+    }
+
+    // ── Session ───────────────────────────────────────────────
+    private void startSession(String setId) {
         showLoading(true);
         apiService.startSession(new StartSessionRequest(setId, "flashcard"))
                 .enqueue(new Callback<ApiResponse<StartSessionResponse>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<StartSessionResponse>> call,
-                                   Response<ApiResponse<StartSessionResponse>> response) {
-                showLoading(false);
-                if (response.isSuccessful() && response.body() != null
-                        && response.body().getResult() != null) {
-                    StartSessionResponse data = response.body().getResult();
-                    sessionId = data.getSessionId();
-                    cards = data.getCards() != null ? data.getCards() : new ArrayList<>();
-                    if (cards.isEmpty()) {
-                        Toast.makeText(FlashcardStudyActivity.this,
-                                "Không có thẻ nào để học!", Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        showCard(0);
+                    @Override
+                    public void onResponse(Call<ApiResponse<StartSessionResponse>> call,
+                                           Response<ApiResponse<StartSessionResponse>> response) {
+                        showLoading(false);
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().getResult() != null) {
+                            StartSessionResponse data = response.body().getResult();
+                            sessionId = data.getSessionId();
+                            cards = data.getCards() != null ? data.getCards() : new ArrayList<>();
+                            if (cards.isEmpty()) {
+                                Toast.makeText(FlashcardStudyActivity.this,
+                                        "Không có thẻ nào để học!", Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                updateBadges();
+                                showCard(0);
+                            }
+                        } else {
+                            Toast.makeText(FlashcardStudyActivity.this,
+                                    "Không thể bắt đầu phiên học", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
                     }
-                } else {
-                    Toast.makeText(FlashcardStudyActivity.this,
-                            "Không thể bắt đầu phiên học", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<StartSessionResponse>> call, Throwable t) {
-                showLoading(false);
-                Toast.makeText(FlashcardStudyActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<ApiResponse<StartSessionResponse>> call, Throwable t) {
+                        showLoading(false);
+                        Toast.makeText(FlashcardStudyActivity.this,
+                                "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
     }
 
     private void showCard(int index) {
-        if (index >= cards.size()) {
-            endSession();
-            return;
-        }
+        if (index >= cards.size()) { endSession(); return; }
         currentIndex = index;
         isFlipped    = false;
 
         SessionCardResponse card = cards.get(index);
         int total = cards.size();
 
-        tvProgress.setText((index + 1) + " / " + total);
+        tvProgress.setText(String.format(Locale.getDefault(), "%d / %d", index + 1, total));
         progressBar.setProgress((index + 1) * 100 / total);
 
-        // Front: term + IPA
-        tvCardFront.setText(card.getTerm());
-        if (tvCardIPA != null)
-            tvCardIPA.setText(card.getIpa() != null ? card.getIpa() : "");
+        tvCardFront.setText(card.getTerm() != null ? card.getTerm() : "");
+        if (tvCardIPA != null) tvCardIPA.setText(card.getIpa() != null ? card.getIpa() : "");
+
+        if (ivCardImage != null) {
+            boolean hasImage = card.getImage() != null && !card.getImage().isEmpty();
+            ivCardImage.setVisibility(hasImage ? View.VISIBLE : View.GONE);
+        }
+
+        layoutFront.setVisibility(View.VISIBLE);
+        layoutBack.setVisibility(View.GONE);
         if (tvTapHint != null) tvTapHint.setVisibility(View.VISIBLE);
 
-        // Hide back side
-        if (layoutBack != null) layoutBack.setVisibility(View.GONE);
-
-        // Hide buttons until flipped
-        btnForgot.setVisibility(View.GONE);
-        btnRemembered.setVisibility(View.GONE);
-
-        // Reset card rotation
+        // Reset rotations khi load thẻ mới
         cardFlashcard.setRotationY(0f);
+        cardFlashcard.setRotation(0f);
+        cardFlashcard.setTranslationX(0f);
+        cardFlashcard.setAlpha(1f);
 
-        // Wire audio button for this card
-        if (btnPlayAudio != null) {
-            String term     = card.getTerm();
-            String audioUrl = card.getAudioUrl();
-            btnPlayAudio.setOnClickListener(v -> playAudio(term, audioUrl));
-        }
+        View.OnClickListener audioL = v -> playAudio(card.getTerm(), card.getAudioUrl());
+        if (btnPlayAudio != null)     btnPlayAudio.setOnClickListener(audioL);
+        if (btnPlayAudioBack != null) btnPlayAudioBack.setOnClickListener(audioL);
     }
 
-    /** Phát âm từ: ưu tiên URL audio từ backend, fallback sang Android TTS */
+    // ── Submit ────────────────────────────────────────────────
+    private void submitAnswer(boolean remembered) {
+        if (currentIndex >= cards.size()) return;
+        SessionCardResponse card = cards.get(currentIndex);
+
+        if (remembered) rememberedCount++;
+        else { forgotCount++; wrongTerms.add(card.getTerm()); }
+        updateBadges();
+
+        AnswerRequest req = new AnswerRequest(card.getFlashcardId(), sessionId, remembered, null);
+        apiService.submitAnswer(req).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override public void onResponse(Call<ApiResponse<Void>> c, Response<ApiResponse<Void>> r) {
+                showCard(currentIndex + 1);
+            }
+            @Override public void onFailure(Call<ApiResponse<Void>> c, Throwable t) {
+                showCard(currentIndex + 1);
+            }
+        });
+    }
+
+    private void updateBadges() {
+        int total = cards.size();
+        if (tvForgotBadge != null)
+            tvForgotBadge.setText(String.format(Locale.getDefault(), "%d/%d", forgotCount, total));
+        if (tvRememberedBadge != null)
+            tvRememberedBadge.setText(String.format(Locale.getDefault(), "%d/%d", rememberedCount, total));
+    }
+
+    // ── Settings sheet ────────────────────────────────────────
+    private void showSettingsSheet() {
+        BottomSheetDialog sheet = new BottomSheetDialog(this);
+        View v = getLayoutInflater().inflate(R.layout.fragment_flashcard_settings_sheet, null);
+        sheet.setContentView(v);
+        ImageButton btnClose = v.findViewById(R.id.btnCloseSettings);
+        if (btnClose != null) btnClose.setOnClickListener(x -> sheet.dismiss());
+        TextView btnExit = v.findViewById(R.id.btnExitSession);
+        if (btnExit != null) btnExit.setOnClickListener(x -> { sheet.dismiss(); confirmExit(); });
+        sheet.show();
+    }
+
+    // ── Audio ─────────────────────────────────────────────────
     private void playAudio(String term, String audioUrl) {
         if (audioUrl != null && !audioUrl.isEmpty()) {
             try {
@@ -192,135 +391,79 @@ public class FlashcardStudyActivity extends AppCompatActivity {
                 mp.setDataSource(audioUrl);
                 mp.setOnPreparedListener(MediaPlayer::start);
                 mp.setOnCompletionListener(MediaPlayer::release);
-                mp.setOnErrorListener((m, what, extra) -> {
-                    m.release();
-                    speakWithTTS(term); // fallback nếu URL lỗi
-                    return true;
-                });
+                mp.setOnErrorListener((m, w, e) -> { m.release(); speakWithTTS(term); return true; });
                 mp.prepareAsync();
-            } catch (Exception e) {
-                speakWithTTS(term);
-            }
-        } else {
-            speakWithTTS(term);
+                return;
+            } catch (Exception ignored) {}
         }
+        speakWithTTS(term);
     }
 
     private void speakWithTTS(String term) {
-        if (tts != null && term != null && !term.isEmpty()) {
+        if (tts != null && !TextUtils.isEmpty(term))
             tts.speak(term, TextToSpeech.QUEUE_FLUSH, null, "tts_" + term);
-        }
     }
 
-    private void flipCard() {
-        if (isFlipped) return;
-        isFlipped = true;
-
-        SessionCardResponse card = cards.get(currentIndex);
-
-        // Flip animation
-        ObjectAnimator flipOut = ObjectAnimator.ofFloat(cardFlashcard, "rotationY", 0f, 90f);
-        flipOut.setDuration(200);
-        flipOut.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                // Show back content
-                tvCardFront.setText(card.getDefinition() != null ? card.getDefinition() : "");
-                if (tvCardIPA != null) tvCardIPA.setText("");
-                if (tvTapHint != null) tvTapHint.setVisibility(View.GONE);
-                if (layoutBack != null) {
-                    layoutBack.setVisibility(View.VISIBLE);
-                    if (tvCardBack != null)
-                        tvCardBack.setText(card.getDefinition() != null ? card.getDefinition() : "");
-                    if (tvExample != null && card.getExample() != null)
-                        tvExample.setText(card.getExample());
-                }
-
-                ObjectAnimator flipIn = ObjectAnimator.ofFloat(cardFlashcard, "rotationY", -90f, 0f);
-                flipIn.setDuration(200);
-                flipIn.start();
-
-                // Show action buttons
-                btnForgot.setVisibility(View.VISIBLE);
-                btnRemembered.setVisibility(View.VISIBLE);
-            }
-        });
-        flipOut.start();
+    // ── Card details ──────────────────────────────────────────
+    private void showCardDetails() {
+        if (cards.isEmpty() || currentIndex >= cards.size()) return;
+        SessionCardResponse c = cards.get(currentIndex);
+        String msg = "Term: " + c.getTerm()
+                + "\nIPA: " + (c.getIpa() != null ? c.getIpa() : "—")
+                + "\nDefinition: " + (c.getDefinition() != null ? c.getDefinition() : "—")
+                + "\nExample: " + (c.getExample() != null ? c.getExample() : "—");
+        new AlertDialog.Builder(this).setTitle(c.getTerm())
+                .setMessage(msg).setPositiveButton("OK", null).show();
     }
 
-    private void submitAnswer(boolean remembered) {
-        SessionCardResponse card = cards.get(currentIndex);
-
-        if (!remembered) wrongTerms.add(card.getTerm());
-
-        AnswerRequest req = new AnswerRequest(
-                card.getFlashcardId(), sessionId, remembered, null);
-
-        apiService.submitAnswer(req).enqueue(new Callback<ApiResponse<Void>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<Void>> call,
-                                   Response<ApiResponse<Void>> response) {
-                showCard(currentIndex + 1);
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
-                // Continue even on failure
-                showCard(currentIndex + 1);
-            }
-        });
-    }
-
+    // ── End session ───────────────────────────────────────────
     private void endSession() {
         if (sessionId == null) { finish(); return; }
-
         apiService.endSession(sessionId, wrongTerms)
                 .enqueue(new Callback<ApiResponse<SessionResultResponse>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<SessionResultResponse>> call,
-                                   Response<ApiResponse<SessionResultResponse>> response) {
-                SessionResultResponse result = null;
-                if (response.isSuccessful() && response.body() != null)
-                    result = response.body().getResult();
-
-                Intent intent = new Intent(FlashcardStudyActivity.this,
-                        SessionResultActivity.class);
-                if (result != null) {
-                    intent.putExtra(SessionResultActivity.EXTRA_CORRECT,  result.getCorrectCount());
-                    intent.putExtra(SessionResultActivity.EXTRA_TOTAL,    result.getTotalQuestions());
-                    intent.putExtra(SessionResultActivity.EXTRA_STREAK,   result.getCurrentStreak());
-                    intent.putExtra(SessionResultActivity.EXTRA_NEW_RECORD, result.isNewRecord());
-                    intent.putExtra(SessionResultActivity.EXTRA_DURATION, result.getDurationSeconds());
-                    intent.putExtra(SessionResultActivity.EXTRA_MODE, "Flashcard");
-                } else {
-                    intent.putExtra(SessionResultActivity.EXTRA_CORRECT,  cards.size() - wrongTerms.size());
-                    intent.putExtra(SessionResultActivity.EXTRA_TOTAL,    cards.size());
-                    intent.putExtra(SessionResultActivity.EXTRA_MODE, "Flashcard");
-                }
-                startActivity(intent);
-                finish();
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<SessionResultResponse>> call, Throwable t) {
-                Intent intent = new Intent(FlashcardStudyActivity.this,
-                        SessionResultActivity.class);
-                intent.putExtra(SessionResultActivity.EXTRA_CORRECT, cards.size() - wrongTerms.size());
-                intent.putExtra(SessionResultActivity.EXTRA_TOTAL,   cards.size());
-                intent.putExtra(SessionResultActivity.EXTRA_MODE, "Flashcard");
-                startActivity(intent);
-                finish();
-            }
-        });
+                    @Override public void onResponse(Call<ApiResponse<SessionResultResponse>> c,
+                                                     Response<ApiResponse<SessionResultResponse>> r) {
+                        goToResult(r.isSuccessful() && r.body() != null ? r.body().getResult() : null);
+                    }
+                    @Override public void onFailure(Call<ApiResponse<SessionResultResponse>> c, Throwable t) {
+                        goToResult(null);
+                    }
+                });
     }
 
+    private void goToResult(SessionResultResponse result) {
+        Intent i = new Intent(this, SessionResultActivity.class);
+        if (result != null) {
+            i.putExtra(SessionResultActivity.EXTRA_CORRECT,    result.getCorrectCount());
+            i.putExtra(SessionResultActivity.EXTRA_TOTAL,      result.getTotalQuestions());
+            i.putExtra(SessionResultActivity.EXTRA_STREAK,     result.getCurrentStreak());
+            i.putExtra(SessionResultActivity.EXTRA_NEW_RECORD, result.isNewRecord());
+            i.putExtra(SessionResultActivity.EXTRA_DURATION,   result.getDurationSeconds());
+        } else {
+            i.putExtra(SessionResultActivity.EXTRA_CORRECT, rememberedCount);
+            i.putExtra(SessionResultActivity.EXTRA_TOTAL,   cards.size());
+        }
+        i.putExtra(SessionResultActivity.EXTRA_MODE, "Flashcard");
+        startActivity(i);
+        finish();
+    }
+
+    // ── Confirm exit ──────────────────────────────────────────
     private void confirmExit() {
         new AlertDialog.Builder(this)
                 .setTitle("Thoát khỏi phiên học?")
-                .setMessage("Tiến trình sẽ không được lưu.")
-                .setPositiveButton("Thoát", (d, w) -> finish())
-                .setNegativeButton("Tiếp tục", null)
-                .show();
+                .setMessage("Kết quả hiện tại sẽ được lưu lại.")
+                .setPositiveButton("Thoát", (d, w) -> {
+                    if (sessionId != null) {
+                        apiService.endSession(sessionId, wrongTerms).enqueue(
+                                new Callback<ApiResponse<SessionResultResponse>>() {
+                                    @Override public void onResponse(Call<ApiResponse<SessionResultResponse>> c,
+                                                                     Response<ApiResponse<SessionResultResponse>> r) { finish(); }
+                                    @Override public void onFailure(Call<ApiResponse<SessionResultResponse>> c, Throwable t) { finish(); }
+                                });
+                    } else finish();
+                })
+                .setNegativeButton("Tiếp tục", null).show();
     }
 
     private void showLoading(boolean loading) {

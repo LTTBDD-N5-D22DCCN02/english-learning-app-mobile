@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.estudy.app.R;
 import com.estudy.app.utils.AccuracyRingView;
 
+import java.util.Locale;
+
 public class SessionResultActivity extends AppCompatActivity {
 
     public static final String EXTRA_CORRECT    = "correct";
@@ -42,55 +44,56 @@ public class SessionResultActivity extends AppCompatActivity {
         AccuracyRingView ring = findViewById(R.id.accuracyRing);
         if (ring != null) ring.setResult(correct, total);
 
-        // Mode
+        // Mode label — tvMode có thể không có trong layout mới, guard bằng null check
         TextView tvMode = findViewById(R.id.tvMode);
         if (tvMode != null) tvMode.setText(mode != null ? mode : "");
 
-        // F/T counters
+        // F / T counters
         TextView tvWrong   = findViewById(R.id.tvWrongCount);
         TextView tvCorrect = findViewById(R.id.tvCorrectCount);
         if (tvWrong   != null) tvWrong.setText(String.valueOf(wrong));
         if (tvCorrect != null) tvCorrect.setText(String.valueOf(correct));
 
-        // Duration
+        // Duration — dùng Locale.getDefault() để tránh lint warning
         TextView tvDuration = findViewById(R.id.tvDuration);
         if (tvDuration != null) {
             if (durationSeconds > 0) {
                 int mins = durationSeconds / 60;
                 int secs = durationSeconds % 60;
-                tvDuration.setText(String.format("%d:%02d", mins, secs));
+                tvDuration.setText(String.format(Locale.getDefault(), "%d:%02d", mins, secs));
             } else {
-                tvDuration.setText("—");
+                tvDuration.setText(R.string.dash);
             }
         }
 
         // Streak
         TextView tvStreak = findViewById(R.id.tvStreak);
-        if (tvStreak != null) tvStreak.setText("🔥 " + streak);
+        if (tvStreak != null) tvStreak.setText(String.valueOf(streak));
 
         // New record badge
         View cardNewRecord = findViewById(R.id.cardNewRecord);
         if (cardNewRecord != null)
             cardNewRecord.setVisibility(isNewRecord ? View.VISIBLE : View.GONE);
 
-        // Motivational message
+        // Motivational message — dùng string resources, không hardcode
         TextView tvMotivation = findViewById(R.id.tvMotivation);
         if (tvMotivation != null) {
-            if      (accuracy >= 90) tvMotivation.setText("Xuất sắc! Bạn đang tiến bộ rất nhanh! 🌟");
-            else if (accuracy >= 70) tvMotivation.setText("Tốt lắm! Hãy tiếp tục luyện tập nhé! 🎉");
-            else if (accuracy >= 50) tvMotivation.setText("Cố gắng thêm một chút! Bạn làm được! 👍");
-            else                     tvMotivation.setText("Đừng bỏ cuộc! Luyện tập thêm để tiến bộ! 💪");
+            if      (accuracy >= 90) tvMotivation.setText(R.string.motivation_excellent);
+            else if (accuracy >= 70) tvMotivation.setText(R.string.motivation_good);
+            else if (accuracy >= 50) tvMotivation.setText(R.string.motivation_ok);
+            else                     tvMotivation.setText(R.string.motivation_keep_going);
         }
 
-        // ── Buttons ──
+        // Back arrow
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
 
-        // Study Again: go back (return to the study screen that launched us)
-        Button btnAgain = findViewById(R.id.btnStudyAgain);
-        if (btnAgain != null)
-            btnAgain.setOnClickListener(v -> finish());
+        // Study Again
+        View btnAgain = findViewById(R.id.btnStudyAgain);
+        if (btnAgain != null) btnAgain.setOnClickListener(v -> finish());
 
-        // View Statistics: open the separate StatisticsActivity
-        Button btnStats = findViewById(R.id.btnViewStats);
+        // View Statistics
+        View btnStats = findViewById(R.id.btnViewStats);
         if (btnStats != null)
             btnStats.setOnClickListener(v -> {
                 Intent intent = new Intent(this, StatisticsActivity.class);
@@ -98,8 +101,8 @@ public class SessionResultActivity extends AppCompatActivity {
                 startActivity(intent);
             });
 
-        // Back to Home: navigate to HomeActivity and clear the back-stack
-        Button btnDone = findViewById(R.id.btnDone);
+        // Back to Home
+        View btnDone = findViewById(R.id.btnDone);
         if (btnDone != null)
             btnDone.setOnClickListener(v -> {
                 Intent intent = new Intent(this, HomeActivity.class);

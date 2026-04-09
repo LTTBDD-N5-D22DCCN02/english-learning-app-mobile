@@ -1,5 +1,6 @@
 package com.estudy.app.controller;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
@@ -76,9 +77,16 @@ public class FlashCardSetCreateActivity extends AppCompatActivity {
                 btnSave.setEnabled(true);
                 if (response.isSuccessful() && response.body() != null
                         && response.body().getResult() != null) {
+                    FlashCardSetResponse result = response.body().getResult();
                     Toast.makeText(FlashCardSetCreateActivity.this,
                             "Created successfully!", Toast.LENGTH_SHORT).show();
-                    finish();
+                    // Mở Overview của bộ vừa tạo
+                    Intent intent = new Intent(FlashCardSetCreateActivity.this,
+                            FlashCardSetOverviewActivity.class);
+                    intent.putExtra("flashcard_set_id",   result.getId());
+                    intent.putExtra("flashcard_set_name", result.getName());
+                    startActivity(intent);
+                    finish(); // finish Create → back stack: List → Overview
                 } else {
                     Toast.makeText(FlashCardSetCreateActivity.this,
                             "Create failed. Please try again.", Toast.LENGTH_SHORT).show();

@@ -279,7 +279,7 @@ public class SpellingActivity extends AppCompatActivity {
 
     private void submitAnswer(boolean correct) {
         FlashCardResponse card = cards.get(currentIndex);
-        AnswerRequest req = new AnswerRequest(card.getId(), setId, "spelling", correct);
+        AnswerRequest req = new AnswerRequest(card.getId(), null, null, correct);
         apiService.submitAnswer(req).enqueue(new Callback<ApiResponse<Void>>() {
             @Override public void onResponse(Call<ApiResponse<Void>> c, Response<ApiResponse<Void>> r) {}
             @Override public void onFailure(Call<ApiResponse<Void>> c, Throwable t) {}
@@ -287,10 +287,10 @@ public class SpellingActivity extends AppCompatActivity {
     }
 
     private void openResult() {
-        Intent intent = new Intent(this, StudyResultActivity.class);
-        intent.putExtra(StudyResultActivity.EXTRA_CORRECT, correctCount);
-        intent.putExtra(StudyResultActivity.EXTRA_WRONG, wrongCount);
-        intent.putExtra(StudyResultActivity.EXTRA_SET_ID, setId);
+        Intent intent = new Intent(this, SessionResultActivity.class);
+        intent.putExtra(SessionResultActivity.EXTRA_CORRECT, correctCount);
+        intent.putExtra(SessionResultActivity.EXTRA_TOTAL, correctCount + wrongCount);
+        intent.putExtra(SessionResultActivity.EXTRA_MODE, "Spelling");
         startActivity(intent);
         finish();
     }

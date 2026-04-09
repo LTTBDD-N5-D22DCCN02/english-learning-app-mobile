@@ -22,7 +22,7 @@ public class FlashCard {
     @Column(updatable = false, nullable = false)
     UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     String term;
 
     String definition;

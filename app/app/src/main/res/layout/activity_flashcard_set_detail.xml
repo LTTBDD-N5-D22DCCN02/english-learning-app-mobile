@@ -47,17 +47,18 @@
             android:padding="8dp" />
     </LinearLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:fillViewport="true"
         android:background="@color/background">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="20dp">
+            android:paddingBottom="72dp">
 
             <!-- ── Row: Search + Filter + Game ─────────────── -->
             <LinearLayout
@@ -112,11 +113,11 @@
                 android:paddingHorizontal="16dp"
                 android:layout_marginBottom="6dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🎯"
-                    android:textSize="16sp"
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_target"
+                    app:tint="@color/primary"
                     android:layout_marginEnd="6dp" />
 
                 <TextView
@@ -226,11 +227,11 @@
                 android:paddingHorizontal="16dp"
                 android:layout_marginBottom="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🎓"
-                    android:textSize="16sp"
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_study"
+                    app:tint="@color/primary"
                     android:layout_marginEnd="6dp" />
 
                 <TextView
@@ -241,6 +242,20 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="@color/primary" />
+
+                <!-- Nút + thêm từ mới → FlashCardListActivity -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddFlashcard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="+ Add a flashcard"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="18dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    style="@style/Widget.MaterialComponents.Button" />
             </LinearLayout>
 
             <!-- Vocabulary list -->
@@ -249,42 +264,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
                 android:layout_marginBottom="16dp" />
 
-            <!-- ── Review / Comments ───────────────────────── -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="16dp"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Review"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-
-                <ImageButton
-                    android:id="@+id/btnToggleComments"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@android:drawable/arrow_down_float"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:tint="@color/text_secondary" />
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvComments"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:paddingHorizontal="16dp"
-                android:layout_marginBottom="12dp" />
+            <!-- Review/Comments moved to FlashCardSetOverviewActivity -->
 
             <LinearLayout
                 android:id="@+id/layoutAddComment"
@@ -344,7 +327,7 @@
                 android:visibility="gone" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <include layout="@layout/bottom_nav" />
 </LinearLayout>

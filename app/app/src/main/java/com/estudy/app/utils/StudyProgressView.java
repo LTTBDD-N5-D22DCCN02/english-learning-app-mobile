@@ -22,7 +22,7 @@ public class StudyProgressView extends View {
 
     private int remembered = 0;
     private int needReview = 0;
-    private int notStudied = 100;
+    private int notStudied = 0;
 
     private final Paint paintRemembered = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint paintNeedReview = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -95,25 +95,28 @@ public class StudyProgressView extends View {
         oval.set(padding, padding, w - padding, h - padding);
 
         int total = remembered + needReview + notStudied;
-        if (total <= 0) total = 1;
+        boolean hasData = total > 0;
 
-        float sweepRemembered  = 360f * remembered  / total;
-        float sweepNeedReview  = 360f * needReview  / total;
-        float sweepNotStudied  = 360f * notStudied  / total;
+        float startAngle = -90f;
+        if (!hasData) {
+            // Chưa có data: vẽ vòng tròn xám đầy
+            canvas.drawArc(oval, startAngle, 360f, false, paintNotStudied);
+        } else {
+            float sweepRemembered = 360f * remembered / total;
+            float sweepNeedReview = 360f * needReview / total;
+            float sweepNotStudied = 360f * notStudied / total;
 
-        float startAngle = -90f; // bắt đầu từ trên cùng
-
-        // Vẽ từng phần
-        if (sweepNotStudied > 0) {
-            canvas.drawArc(oval, startAngle, sweepNotStudied, false, paintNotStudied);
-            startAngle += sweepNotStudied;
-        }
-        if (sweepNeedReview > 0) {
-            canvas.drawArc(oval, startAngle, sweepNeedReview, false, paintNeedReview);
-            startAngle += sweepNeedReview;
-        }
-        if (sweepRemembered > 0) {
-            canvas.drawArc(oval, startAngle, sweepRemembered, false, paintRemembered);
+            if (sweepNotStudied > 0) {
+                canvas.drawArc(oval, startAngle, sweepNotStudied, false, paintNotStudied);
+                startAngle += sweepNotStudied;
+            }
+            if (sweepNeedReview > 0) {
+                canvas.drawArc(oval, startAngle, sweepNeedReview, false, paintNeedReview);
+                startAngle += sweepNeedReview;
+            }
+            if (sweepRemembered > 0) {
+                canvas.drawArc(oval, startAngle, sweepRemembered, false, paintRemembered);
+            }
         }
 
         // Vòng tròn trắng ở giữa (tạo hiệu ứng donut)
@@ -122,12 +125,10 @@ public class StudyProgressView extends View {
         float innerR = (w / 2f) - stroke - 6 * d;
         canvas.drawCircle(cx, cy, innerR, paintCenter);
 
-        // Text số tổng ở giữa
-        String totalStr = String.valueOf(total);
+        // Text ở giữa
+        String totalStr = hasData ? String.valueOf(total) : "0";
         float textY = cy - (paintText.descent() + paintText.ascent()) / 2;
         canvas.drawText(totalStr, cx, textY, paintText);
-
-        // Sub label
         canvas.drawText("words", cx, textY + 14 * d, paintSubText);
     }
 }
