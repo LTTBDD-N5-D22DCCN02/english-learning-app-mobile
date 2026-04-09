@@ -1,3 +1,24 @@
 <resources>
-    <string name="app_name">app</string>
+    <string name="app_name">EStudy</string>
+    <string name="dash">—</string>
+    <string name="motivation_excellent">Xuất sắc! Bạn đang tiến bộ rất nhanh!</string>
+    <string name="motivation_good">Tốt lắm! Hãy tiếp tục luyện tập nhé!</string>
+    <string name="motivation_ok">Cố gắng thêm một chút! Bạn làm được!</string>
+    <string name="motivation_keep_going">Đừng bỏ cuộc! Luyện tập thêm để tiến bộ!</string>
+    <string name="result_title">Result</string>
+    <string name="result_study_again">Study Again</string>
+    <string name="result_view_stats">View Statistics</string>
+    <string name="result_back_home">Back to Home</string>
+    <string name="result_time_label">Thời gian</string>
+    <string name="result_streak_label">Ngày liên tiếp</string>
+    <string name="result_new_record_title">Kỷ lục mới!</string>
+    <string name="result_new_record_desc">Streak dài nhất từ trước đến nay!</string>
+    <string name="label_forgot">Chưa nhớ</string>
+    <string name="label_remembered">Đã nhớ</string>
+    <string name="swipe_hint">← Vuốt trái: Chưa nhớ   |   Vuốt phải: Đã nhớ →</string>
+    <string name="tap_to_flip">( Nhấn để lật thẻ )</string>
+    <string name="tap_to_flip_back">( Nhấn để lật lại )</string>
+    <string name="view_details">View Details</string>
+    <string name="btn_forgot">Forgot</string>
+    <string name="btn_remembered">Remembered</string>
 </resources>

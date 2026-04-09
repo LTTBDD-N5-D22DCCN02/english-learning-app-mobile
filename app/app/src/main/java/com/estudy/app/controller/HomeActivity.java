@@ -176,7 +176,7 @@ public class HomeActivity extends AppCompatActivity {
                             FlashCardSetHorizontalAdapter adapter =
                                     new FlashCardSetHorizontalAdapter(list, item -> {
                                         Intent intent = new Intent(HomeActivity.this,
-                                                FlashCardSetDetailActivity.class);
+                                                FlashCardSetOverviewActivity.class);
                                         intent.putExtra("flashcard_set_id",   item.getId());
                                         intent.putExtra("flashcard_set_name", item.getName());
                                         startActivity(intent);

@@ -19,6 +19,7 @@ public class FlashCardSetDetailResponse {
     String description;
     Privacy privacy;
     LocalDateTime createdAt;
+    String ownerUsername;  // để biết chủ sở hữu
     List<FlashCardResponse> flashCards;
     List<CommentResponse> comments;
 }

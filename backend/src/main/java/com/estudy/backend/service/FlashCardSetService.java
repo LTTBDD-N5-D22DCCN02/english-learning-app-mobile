@@ -8,6 +8,7 @@ import com.estudy.backend.entity.User;
 import com.estudy.backend.exception.AppException;
 import com.estudy.backend.exception.ErrorCode;
 import com.estudy.backend.mapper.FlashCardSetMapper;
+import com.estudy.backend.repository.FlashCardRepository;
 import com.estudy.backend.repository.FlashCardSetRepository;
 import com.estudy.backend.repository.UserRepository;
 import lombok.AccessLevel;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardSetService {
 
+    FlashCardRepository flashCardRepository;
     FlashCardSetRepository flashCardSetRepository;
     UserRepository userRepository;
     FlashCardSetMapper flashCardSetMapper;
@@ -110,6 +112,18 @@ public class FlashCardSetService {
                 && !flashCardSet.getUser().getId().equals(currentUser.getId()))
             throw new AppException(ErrorCode.FLASHCARD_SET_NOT_OWNED);
 
-        return flashCardSetMapper.toFlashCardSetDetailResponse(flashCardSet);
+        // Map thủ công để đảm bảo chỉ lấy flashcard chưa bị xóa
+        FlashCardSetDetailResponse response = flashCardSetMapper.toFlashCardSetDetailResponse(flashCardSet);
+
+        // Override flashCards với list đã filter deleted = false
+        List<com.estudy.backend.entity.FlashCard> activeCards =
+                flashCardRepository.findByFlashCardSetIdAndDeletedFalse(flashCardSet.getId());
+        response.setFlashCards(
+                activeCards.stream()
+                        .map(flashCardSetMapper::toFlashCardResponse)
+                        .collect(java.util.stream.Collectors.toList())
+        );
+
+        return response;
     }
 }

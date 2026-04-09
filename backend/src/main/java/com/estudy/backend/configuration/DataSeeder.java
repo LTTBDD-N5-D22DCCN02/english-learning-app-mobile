@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -20,16 +21,21 @@ public class DataSeeder implements ApplicationRunner {
 
     private final UserRepository userRepository;
     private final FlashCardSetRepository flashCardSetRepository;
+    private final FlashCardRepository flashCardRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments args) {
-        if (userRepository.count() > 0) {
-            log.info("Data already seeded, skipping.");
-            return;
-        }
+        try {
+            if (userRepository.count() > 0) {
+                log.info("Data already seeded, skipping.");
+                return;
+            }
 
-        log.info("Seeding test data...");
+            log.info("Seeding test data...");
+        } catch (Exception e) {
+            log.error("Error checking if data seeded, proceeding anyway", e);
+        }
 
         // ── 1. User test ──────────────────────────────────────
         User user = User.builder()
@@ -43,9 +49,15 @@ public class DataSeeder implements ApplicationRunner {
                 .longestStreak(12)
                 .deleted(false)
                 .build();
-        userRepository.save(user);
+        try {
+            user = userRepository.save(user);
+            log.info("Created user: {}", user.getUsername());
+        } catch (Exception e) {
+            log.error("Failed to create user", e);
+            return;
+        }
 
-        // ── 2. TOEIC Vocabulary ───────────────────────────────
+        // ── 2. TOEIC Vocabulary (10 từ) ───────────────────────
         FlashCardSet toeicSet = FlashCardSet.builder()
                 .name("TOEIC Vocabulary")
                 .description("Từ vựng TOEIC thông dụng nhất")
@@ -53,22 +65,35 @@ public class DataSeeder implements ApplicationRunner {
                 .user(user)
                 .deleted(false)
                 .build();
+        try {
+            toeicSet = flashCardSetRepository.save(toeicSet);
+            log.info("Created flashcard set: {}", toeicSet.getName());
+        } catch (Exception e) {
+            log.error("Failed to create TOEIC flashcard set", e);
+            return;
+        }
 
-        toeicSet.setFlashCards(List.of(
-                card("abundant",    "dồi dào, phong phú",    "/əˈbʌndənt/",   toeicSet),
-                card("allocate",    "phân bổ, phân chia",     "/ˈæləkeɪt/",    toeicSet),
-                card("assess",      "đánh giá, nhận xét",     "/əˈsɛs/",        toeicSet),
-                card("revenue",     "doanh thu",              "/ˈrɛvənjuː/",    toeicSet),
-                card("implement",   "triển khai, thực hiện",  "/ˈɪmplɪmɛnt/",   toeicSet),
-                card("collaborate", "hợp tác, cộng tác",      "/kəˈlæbəreɪt/",  toeicSet),
-                card("efficient",   "hiệu quả, có năng suất", "/ɪˈfɪʃənt/",     toeicSet),
-                card("negotiate",   "đàm phán, thương lượng", "/nɪˈɡoʊʃieɪt/",  toeicSet),
-                card("mandatory",   "bắt buộc, cưỡng chế",   "/ˈmændətɔːri/",  toeicSet),
-                card("pursuant",    "theo, chiếu theo",       "/pərˈsuːənt/",   toeicSet)
-        ));
-        flashCardSetRepository.save(toeicSet);
+        // Save từng từ riêng — tránh lỗi với immutable List.of()
+        List<FlashCard> toeicCards = new ArrayList<>();
+        toeicCards.add(card("abundant",    "dồi dào, phong phú",    "/əˈbʌndənt/",   toeicSet));
+        toeicCards.add(card("allocate",    "phân bổ, phân chia",     "/ˈæləkeɪt/",    toeicSet));
+        toeicCards.add(card("assess",      "đánh giá, nhận xét",     "/əˈsɛs/",        toeicSet));
+        toeicCards.add(card("revenue",     "doanh thu",              "/ˈrɛvənjuː/",    toeicSet));
+        toeicCards.add(card("implement",   "triển khai, thực hiện",  "/ˈɪmplɪmɛnt/",   toeicSet));
+        toeicCards.add(card("collaborate", "hợp tác, cộng tác",      "/kəˈlæbəreɪt/",  toeicSet));
+        toeicCards.add(card("efficient",   "hiệu quả, có năng suất", "/ɪˈfɪʃənt/",     toeicSet));
+        toeicCards.add(card("negotiate",   "đàm phán, thương lượng", "/nɪˈɡoʊʃieɪt/",  toeicSet));
+        toeicCards.add(card("mandatory",   "bắt buộc, cưỡng chế",   "/ˈmændətɔːri/",  toeicSet));
+        toeicCards.add(card("pursuant",    "theo, chiếu theo",       "/pərˈsuːənt/",   toeicSet));
+        try {
+            flashCardRepository.saveAll(toeicCards);
+            log.info("Saved TOEIC set with {} cards", toeicCards.size());
+        } catch (Exception e) {
+            log.error("Failed to save TOEIC flashcards", e);
+            return;
+        }
 
-        // ── 3. Business English ───────────────────────────────
+        // ── 3. Business English (7 từ) ────────────────────────
         FlashCardSet bizSet = FlashCardSet.builder()
                 .name("Business English")
                 .description("Tiếng Anh thương mại")
@@ -76,19 +101,32 @@ public class DataSeeder implements ApplicationRunner {
                 .user(user)
                 .deleted(false)
                 .build();
+        try {
+            bizSet = flashCardSetRepository.save(bizSet);
+            log.info("Created flashcard set: {}", bizSet.getName());
+        } catch (Exception e) {
+            log.error("Failed to create Business English flashcard set", e);
+            return;
+        }
 
-        bizSet.setFlashCards(List.of(
-                card("agenda",    "chương trình nghị sự",   "/əˈdʒɛndə/",    bizSet),
-                card("deadline",  "thời hạn cuối",           "/ˈdɛdlaɪn/",    bizSet),
-                card("invoice",   "hóa đơn",                 "/ˈɪnvɔɪs/",     bizSet),
-                card("merger",    "sự sáp nhập",             "/ˈmɜːrdʒər/",   bizSet),
-                card("benchmark", "tiêu chuẩn so sánh",      "/ˈbɛntʃmɑːrk/", bizSet),
-                card("leverage",  "đòn bẩy, tận dụng",       "/ˈlɛvərɪdʒ/",   bizSet),
-                card("outsource", "thuê ngoài",              "/ˈaʊtsɔːrs/",   bizSet)
-        ));
-        flashCardSetRepository.save(bizSet);
+        List<FlashCard> bizCards = new ArrayList<>();
+        bizCards.add(card("agenda",    "chương trình nghị sự",   "/əˈdʒɛndə/",    bizSet));
+        bizCards.add(card("deadline",  "thời hạn cuối",           "/ˈdɛdlaɪn/",    bizSet));
+        bizCards.add(card("invoice",   "hóa đơn",                 "/ˈɪnvɔɪs/",     bizSet));
+        bizCards.add(card("merger",    "sự sáp nhập",             "/ˈmɜːrdʒər/",   bizSet));
+        bizCards.add(card("benchmark", "tiêu chuẩn so sánh",      "/ˈbɛntʃmɑːrk/", bizSet));
+        bizCards.add(card("leverage",  "đòn bẩy, tận dụng",       "/ˈlɛvərɪdʒ/",   bizSet));
+        bizCards.add(card("outsource", "thuê ngoài",              "/ˈaʊtsɔːrs/",   bizSet));
+        try {
+            flashCardRepository.saveAll(bizCards);
+            log.info("Saved Business English set with {} cards", bizCards.size());
+        } catch (Exception e) {
+            log.error("Failed to save Business English flashcards", e);
+            return;
+        }
 
-        log.info("Seeded: user maihuong/123456789, 2 sets, 17 cards.");
+        log.info("Seeded: user maihuong/123456789, 2 sets, {} cards total.",
+                toeicCards.size() + bizCards.size());
     }
 
     private FlashCard card(String term, String definition, String ipa, FlashCardSet set) {

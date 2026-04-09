@@ -47,6 +47,14 @@ public class CommentService {
         FlashCardSet flashCardSet = flashCardSetRepository.findByIdAndDeletedFalse(flashCardSetId)
                 .orElseThrow(() -> new AppException(ErrorCode.FLASHCARD_SET_NOT_FOUND));
 
+        // Kiểm tra quyền comment:
+        // - PUBLIC: ai cũng comment được
+        // - PRIVATE: chỉ chủ sở hữu mới comment được
+        boolean isOwner = flashCardSet.getUser().getId().equals(currentUser.getId());
+        if (!isOwner && flashCardSet.getPrivacy().name().equals("PRIVATE")) {
+            throw new AppException(ErrorCode.FLASHCARD_SET_NOT_OWNED);
+        }
+
         Comment comment = commentMapper.toComment(request);
         comment.setUser(currentUser);
         comment.setFlashCardSet(flashCardSet);

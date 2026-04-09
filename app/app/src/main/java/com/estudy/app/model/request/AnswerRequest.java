@@ -3,11 +3,10 @@ package com.estudy.app.model.request;
 public class AnswerRequest {
     private String flashcardId;
     private String sessionId;
-    private Boolean remembered; // flashcard mode
-    private Boolean correct;    // quiz / spelling mode
+    private Boolean remembered;  // cho flashcard mode
+    private Boolean correct;     // cho quiz / word_quiz mode
 
-    public AnswerRequest(String flashcardId, String sessionId,
-                         Boolean remembered, Boolean correct) {
+    public AnswerRequest(String flashcardId, String sessionId, Boolean remembered, Boolean correct) {
         this.flashcardId = flashcardId;
         this.sessionId   = sessionId;
         this.remembered  = remembered;

@@ -1,5 +1,7 @@
 package com.estudy.app.controller;
 
+import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -15,10 +17,15 @@ public class FlashCardDetailAdapter
 
     private final List<FlashCardResponse> items;
     private final OnDotMenuClick dotMenuClick;
+    private TextToSpeech tts;
 
     public FlashCardDetailAdapter(List<FlashCardResponse> items, OnDotMenuClick dotMenuClick) {
         this.items = items;
         this.dotMenuClick = dotMenuClick;
+    }
+
+    public void setTts(TextToSpeech tts) {
+        this.tts = tts;
     }
 
     @NonNull @Override
@@ -30,6 +37,7 @@ public class FlashCardDetailAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder h, int position) {
+        Log.d("TEST", "size = " + items.size());
         FlashCardResponse item = items.get(position);
         h.tvTerm.setText(item.getTerm() != null ? item.getTerm() : "");
         h.tvIpa.setText(item.getIpa() != null ? item.getIpa() : "");
@@ -39,9 +47,15 @@ public class FlashCardDetailAdapter
             if (dotMenuClick != null) dotMenuClick.onClick(item);
         });
 
-        h.btnAudio.setOnClickListener(v ->
-                Toast.makeText(v.getContext(),
-                        "Audio: " + item.getTerm(), Toast.LENGTH_SHORT).show());
+
+        // Audio: FlashCardResponse chưa có audioUrl → dùng TTS trực tiếp
+        h.btnAudio.setOnClickListener(v -> speakWithTTS(item.getTerm()));
+    }
+
+    private void speakWithTTS(String term) {
+        if (tts != null && term != null && !term.isEmpty()) {
+            tts.speak(term, TextToSpeech.QUEUE_FLUSH, null, "tts_" + term);
+        }
     }
 
     @Override public int getItemCount() { return items.size(); }

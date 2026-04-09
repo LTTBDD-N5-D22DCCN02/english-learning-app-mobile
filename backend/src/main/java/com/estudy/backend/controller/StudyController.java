@@ -3,14 +3,12 @@ package com.estudy.backend.controller;
 import com.estudy.backend.dto.request.AnswerRequest;
 import com.estudy.backend.dto.request.StartSessionRequest;
 import com.estudy.backend.dto.response.*;
-import com.estudy.backend.dto.response.StudyTodayResponse;
 import com.estudy.backend.service.StudyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/study")
@@ -34,17 +32,17 @@ public class StudyController {
                 .result(studyService.startSession(req)).build();
     }
 
-    /** POST /study/answer — UC-STUDY-02~05 */
+    /** POST /study/answer — UC-STUDY-02~05: ghi nhận câu trả lời + cập nhật SM-2 */
     @PostMapping("/answer")
     public ApiResponse<Void> submitAnswer(@Valid @RequestBody AnswerRequest req) {
         studyService.submitAnswer(req);
         return ApiResponse.<Void>builder().build();
     }
 
-    /** PUT /study/session/{id}/end — UC-STUDY-02~05 + UC-STUDY-06 */
+    /** PUT /study/session/{id}/end — UC-STUDY-06: kết thúc phiên + cập nhật streak */
     @PutMapping("/session/{sessionId}/end")
     public ApiResponse<SessionResultResponse> endSession(
-            @PathVariable UUID sessionId,
+            @PathVariable String sessionId,
             @RequestBody(required = false) List<String> wrongTerms) {
         return ApiResponse.<SessionResultResponse>builder()
                 .result(studyService.endSession(sessionId, wrongTerms)).build();
