@@ -1,11 +1,14 @@
 package com.estudy.backend.controller;
 
+import com.estudy.backend.dto.request.ClassFlashCardSetRequest;
+import com.estudy.backend.dto.request.UpdateMemberRoleRequest;
 import com.estudy.backend.dto.request.ClassRequest;
 import com.estudy.backend.dto.request.CopyClassRequest;
 import com.estudy.backend.dto.request.JoinClassRequest;
 import com.estudy.backend.dto.response.ApiResponse;
 import com.estudy.backend.dto.response.ClassMemberResponse;
 import com.estudy.backend.dto.response.ClassResponse;
+import com.estudy.backend.dto.response.FlashCardSetResponse;
 import com.estudy.backend.service.ClassService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -171,6 +174,87 @@ public class ClassController {
 
         return ApiResponse.<List<ClassResponse>>builder()
                 .result(classService.getPublicClasses(keyword))
+                .build();
+    }
+
+    // ─── UC-16: Lấy mã lớp ─────────────────────────────────────
+    @GetMapping("/{classId}/code")
+    ApiResponse<String> getClassCode(@PathVariable UUID classId) {
+        return ApiResponse.<String>builder()
+                .result(classService.getClassCode(classId))
+                .build();
+    }
+
+    // ─── UC-23: Tìm kiếm thành viên ────────────────────────────
+    @GetMapping("/{classId}/members/search")
+    ApiResponse<List<ClassMemberResponse>> searchMembers(
+            @PathVariable UUID classId,
+            @RequestParam(defaultValue = "") String keyword) {
+        return ApiResponse.<List<ClassMemberResponse>>builder()
+                .result(classService.searchMembers(classId, keyword))
+                .build();
+    }
+
+    // ─── UC-24: Cập nhật quyền thành viên ──────────────────────
+    @PatchMapping("/{classId}/members/{userId}/role")
+    ApiResponse<Void> updateMemberRole(
+            @PathVariable UUID classId,
+            @PathVariable UUID userId,
+            @RequestBody @Valid UpdateMemberRoleRequest request) {
+        classService.updateMemberRole(classId, userId, request.getRole());
+        return ApiResponse.<Void>builder()
+                .message("Member role updated successfully")
+                .build();
+    }
+
+    // ─── UC-17: Xem danh sách bộ Flashcard trong lớp ───────────
+    @GetMapping("/{classId}/flashcard-sets")
+    ApiResponse<List<FlashCardSetResponse>> getClassFlashCardSets(@PathVariable UUID classId) {
+        return ApiResponse.<List<FlashCardSetResponse>>builder()
+                .result(classService.getClassFlashCardSets(classId, null))
+                .build();
+    }
+
+    // ─── UC-22: Tìm kiếm bộ Flashcard trong lớp ────────────────
+    @GetMapping("/{classId}/flashcard-sets/search")
+    ApiResponse<List<FlashCardSetResponse>> searchClassFlashCardSets(
+            @PathVariable UUID classId,
+            @RequestParam(defaultValue = "") String keyword) {
+        return ApiResponse.<List<FlashCardSetResponse>>builder()
+                .result(classService.getClassFlashCardSets(classId, keyword))
+                .build();
+    }
+
+    // ─── UC-18: Thêm Flashcard Set vào lớp ─────────────────────
+    @PostMapping("/{classId}/flashcard-sets")
+    @ResponseStatus(HttpStatus.CREATED)
+    ApiResponse<FlashCardSetResponse> addClassFlashCardSet(
+            @PathVariable UUID classId,
+            @RequestBody @Valid ClassFlashCardSetRequest request) {
+        return ApiResponse.<FlashCardSetResponse>builder()
+                .result(classService.addClassFlashCardSet(classId, request))
+                .build();
+    }
+
+    // ─── UC-19: Sửa Flashcard Set trong lớp ────────────────────
+    @PutMapping("/{classId}/flashcard-sets/{setId}")
+    ApiResponse<FlashCardSetResponse> updateClassFlashCardSet(
+            @PathVariable UUID classId,
+            @PathVariable UUID setId,
+            @RequestBody @Valid ClassFlashCardSetRequest request) {
+        return ApiResponse.<FlashCardSetResponse>builder()
+                .result(classService.updateClassFlashCardSet(classId, setId, request))
+                .build();
+    }
+
+    // ─── UC-20: Xóa Flashcard Set khỏi lớp ─────────────────────
+    @DeleteMapping("/{classId}/flashcard-sets/{setId}")
+    ApiResponse<Void> deleteClassFlashCardSet(
+            @PathVariable UUID classId,
+            @PathVariable UUID setId) {
+        classService.deleteClassFlashCardSet(classId, setId);
+        return ApiResponse.<Void>builder()
+                .message("Flashcard set removed from class successfully")
                 .build();
     }
 }

@@ -1,11 +1,11 @@
 package com.estudy.app.model.request;
 
-public class FlashCardSetRequest {
+public class ClassRequest {
     private String name;
     private String description;
-    private String privacy;
+    private String privacy; // "PUBLIC" | "PRIVATE"
 
-    public FlashCardSetRequest(String name, String description, String privacy) {
+    public ClassRequest(String name, String description, String privacy) {
         this.name = name;
         this.description = description;
         this.privacy = privacy;

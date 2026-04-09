@@ -6,44 +6,148 @@
     android:orientation="horizontal"
     android:gravity="center">
 
-    <LinearLayout android:id="@+id/btnNavHome" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Home -->
+    <LinearLayout
+        android:id="@+id/btnNavHome"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:src="@drawable/ic_home" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/btnNavSets" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Flashcard Sets -->
+    <LinearLayout
+        android:id="@+id/btnNavSets"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:src="@drawable/ic_folder" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sets"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/btnNavAdd" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Add -->
+    <LinearLayout
+        android:id="@+id/btnNavAdd"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:src="@drawable/ic_add" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/btnNavNotif" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Classes (MỚI) -->
+    <LinearLayout
+        android:id="@+id/btnNavClasses"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_class" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Classes"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- Notifications -->
+    <LinearLayout
+        android:id="@+id/btnNavNotif"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:src="@drawable/ic_bell" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notif"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/btnNavStats" android:layout_width="0dp"
-        android:layout_height="match_parent" android:layout_weight="1"
-        android:gravity="center" android:orientation="vertical"
+    <!-- Stats -->
+    <LinearLayout
+        android:id="@+id/btnNavStats"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:src="@drawable/ic_stats" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stats"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
 </LinearLayout>

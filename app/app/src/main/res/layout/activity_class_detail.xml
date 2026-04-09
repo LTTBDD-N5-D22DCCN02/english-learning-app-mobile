@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <include layout="@layout/toolbar_common" android:id="@+id/toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center_horizontal">
+
+        <!-- Flashcard Sets -->
+        <Button
+            android:id="@+id/btnFlashcardSets"
+            android:layout_width="280dp"
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:text="Flashcard Sets"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_folder"
+            android:drawablePadding="12dp"
+            android:background="@drawable/bg_banner_primary" />
+
+        <!-- Member List -->
+        <Button
+            android:id="@+id/btnMemberList"
+            android:layout_width="280dp"
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:text="Member list"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_group"
+            android:drawablePadding="12dp"
+            android:background="@drawable/bg_banner_primary" />
+
+        <!-- Group Management (chỉ LEADER) -->
+        <Button
+            android:id="@+id/btnGroupManagement"
+            android:layout_width="280dp"
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:text="Group Management"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:visibility="gone"
+            android:background="@drawable/bg_banner_primary" />
+
+        <!-- Setting -->
+        <Button
+            android:id="@+id/btnSetting"
+            android:layout_width="280dp"
+            android:layout_height="56dp"
+            android:text="Setting"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_settings"
+            android:drawablePadding="12dp"
+            android:background="@drawable/bg_banner_primary" />
+    </LinearLayout>
+
+    <include layout="@layout/bottom_nav" />
+</LinearLayout>

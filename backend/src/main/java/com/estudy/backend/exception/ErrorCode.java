@@ -85,6 +85,13 @@ public enum ErrorCode {
     CLASS_LEADER_CANNOT_LEAVE(3106, "Class leader cannot leave the class. Delete the class instead.", HttpStatus.BAD_REQUEST),
     CLASS_MEMBER_NOT_FOUND(3107, "Class member not found", HttpStatus.NOT_FOUND),
     CLASS_NOT_PUBLIC(3108, "This class is not public. Please use class code to join.", HttpStatus.BAD_REQUEST),
+    // THÊM vào phần CLASS errors:
+    CLASS_FLASHCARD_SET_NOT_FOUND(3109, "Flashcard set not found in this class", HttpStatus.NOT_FOUND),
+    CLASS_FLASHCARD_SET_NO_PERMISSION(3110, "Only the leader or owner can perform this action", HttpStatus.FORBIDDEN),
+    CLASS_CANNOT_CHANGE_LEADER_ROLE(3111, "Cannot change the role of the class leader", HttpStatus.BAD_REQUEST),
+    CLASS_INVALID_ROLE(3112, "Invalid role. Only ADMIN or MEMBER roles can be assigned", HttpStatus.BAD_REQUEST),
+    // Thêm vào phần CLASS
+    CLASS_NAME_DUPLICATED(3113, "Class name already exists", HttpStatus.BAD_REQUEST),
     ;
 
     int code;

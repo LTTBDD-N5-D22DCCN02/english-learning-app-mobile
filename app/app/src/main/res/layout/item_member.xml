@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <!-- Avatar -->
+    <ImageView
+        android:id="@+id/ivAvatar"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/bg_avatar"
+        android:background="@drawable/bg_primary_circle"
+        android:padding="10dp"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Info row với chiều cao cố định wrap_content cho tất cả -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@drawable/bg_banner_primary"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <!-- Tên thành viên -->
+        <TextView
+            android:id="@+id/tvMemberName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Badge vai trò – chỉ hiện khi LEADER -->
+        <TextView
+            android:id="@+id/tvRole"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leader"
+            android:textColor="#FFEB3B"
+            android:textSize="11sp"
+            android:textStyle="italic"
+            android:visibility="gone" />
+
+        <!-- Ngày tham gia -->
+        <TextView
+            android:id="@+id/tvJoinDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#CCFFFFFF"
+            android:textSize="11sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Menu button: chỉ hiện với thành viên MEMBER khi người dùng là LEADER -->
+    <ImageButton
+        android:id="@+id/btnMemberMore"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_more_vert"
+        android:background="@null"
+        android:layout_marginStart="8dp"
+        android:visibility="gone" />
+</LinearLayout>

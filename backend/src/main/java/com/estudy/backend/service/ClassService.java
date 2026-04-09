@@ -1,24 +1,22 @@
 package com.estudy.backend.service;
 
+import com.estudy.backend.dto.request.ClassFlashCardSetRequest;
 import com.estudy.backend.dto.request.ClassRequest;
 import com.estudy.backend.dto.request.CopyClassRequest;
 import com.estudy.backend.dto.request.JoinClassRequest;
 import com.estudy.backend.dto.response.ClassMemberResponse;
 import com.estudy.backend.dto.response.ClassResponse;
+import com.estudy.backend.dto.response.FlashCardSetResponse;
+import com.estudy.backend.entity.*;
 import com.estudy.backend.entity.Class;
-import com.estudy.backend.entity.ClassMember;
-import com.estudy.backend.entity.Notification;
-import com.estudy.backend.entity.User;
 import com.estudy.backend.enums.ClassMemberRole;
 import com.estudy.backend.enums.ClassMemberStatus;
 import com.estudy.backend.enums.Privacy;
 import com.estudy.backend.exception.AppException;
 import com.estudy.backend.exception.ErrorCode;
 import com.estudy.backend.mapper.ClassMapper;
-import com.estudy.backend.repository.ClassMemberRepository;
-import com.estudy.backend.repository.ClassRepository;
-import com.estudy.backend.repository.NotificationRepository;
-import com.estudy.backend.repository.UserRepository;
+import com.estudy.backend.mapper.FlashCardSetMapper;
+import com.estudy.backend.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,6 +41,9 @@ public class ClassService {
     UserRepository userRepository;
     ClassMapper classMapper;
 
+    // THÊM vào field declarations:
+    FlashCardSetRepository flashCardSetRepository;
+    FlashCardSetMapper flashCardSetMapper;
     // ─── Helper: lấy user hiện tại ────────────────────────────────
     private User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -167,15 +168,22 @@ public class ClassService {
         if (classMemberRepository.existsByClazzAndUserAndStatus(aClass, currentUser, ClassMemberStatus.PENDING))
             throw new AppException(ErrorCode.CLASS_JOIN_REQUEST_PENDING);
 
-        ClassMember joinRequest = ClassMember.builder()
-                .clazz(aClass)
-                .user(currentUser)
-                .role(ClassMemberRole.MEMBER)
-                .status(ClassMemberStatus.PENDING)
-                .build();
-        classMemberRepository.save(joinRequest);
+        // Nếu đã bị REJECTED trước đó → update lại thành PENDING thay vì insert mới
+        ClassMember existing = classMemberRepository
+                .findByClazzAndUser(aClass, currentUser).orElse(null);
 
-        // Thông báo cho leader
+        if (existing != null) {
+            existing.setStatus(ClassMemberStatus.PENDING);
+            classMemberRepository.save(existing);
+        } else {
+            classMemberRepository.save(ClassMember.builder()
+                    .clazz(aClass)
+                    .user(currentUser)
+                    .role(ClassMemberRole.MEMBER)
+                    .status(ClassMemberStatus.PENDING)
+                    .build());
+        }
+
         classMemberRepository.findLeaderByClass(aClass)
                 .ifPresent(leaderMember -> sendNotification(
                         leaderMember.getUser(),
@@ -207,14 +215,20 @@ public class ClassService {
         }
 
         // Tạo yêu cầu tham gia
-        ClassMember joinRequest = ClassMember.builder()
-                .clazz(aClass)
-                .user(currentUser)
-                .role(ClassMemberRole.MEMBER)
-                .status(ClassMemberStatus.PENDING)
-                .build();
-        classMemberRepository.save(joinRequest);
+        ClassMember existing = classMemberRepository
+                .findByClazzAndUser(aClass, currentUser).orElse(null);
 
+        if (existing != null) {
+            existing.setStatus(ClassMemberStatus.PENDING);
+            classMemberRepository.save(existing);
+        } else {
+            classMemberRepository.save(ClassMember.builder()
+                    .clazz(aClass)
+                    .user(currentUser)
+                    .role(ClassMemberRole.MEMBER)
+                    .status(ClassMemberStatus.PENDING)
+                    .build());
+        }
         // Gửi thông báo cho Leader
         classMemberRepository.findLeaderByClass(aClass)
                 .ifPresent(leaderMember -> sendNotification(
@@ -324,7 +338,7 @@ public class ClassService {
                 .collect(Collectors.toList());
     }
 
-    // ─── Quản lý thành viên ───────────────────────────────────────
+    // UC-13: Xem danh sách thành viên
     public List<ClassMemberResponse> getMembers(UUID classId) {
         User currentUser = getCurrentUser();
         Class aClass = getActiveClass(classId);
@@ -339,6 +353,7 @@ public class ClassService {
                 .collect(Collectors.toList());
     }
 
+    // UC-14: Duyệt yêu cầu gia nhập
     public List<ClassMemberResponse> getPendingRequests(UUID classId) {
         User currentUser = getCurrentUser();
         Class aClass = getActiveClass(classId);
@@ -400,6 +415,7 @@ public class ClassService {
         );
     }
 
+    // UC-15: Xóa thành viên khỏi lớp học
     @Transactional
     public void removeMember(UUID classId, UUID userId) {
         User currentUser = getCurrentUser();
@@ -427,5 +443,175 @@ public class ClassService {
                 "MEMBER_REMOVED",
                 aClass.getId()
         );
+    }
+
+    // UC-16: Hiển thị mã lớp (Class Code)
+    public String getClassCode(UUID classId) {
+        User currentUser = getCurrentUser();
+        Class aClass = getActiveClass(classId);
+
+        // Chỉ Leader mới xem được
+        classMemberRepository.findByClazzAndUser(aClass, currentUser)
+                .filter(cm -> cm.getRole() == ClassMemberRole.LEADER)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_LEADER));
+
+        return aClass.getCode();
+    }
+    // UC-23: Tìm kiếm thành viên trong lớp
+    public List<ClassMemberResponse> searchMembers(UUID classId, String keyword) {
+        User currentUser = getCurrentUser();
+        Class aClass = getActiveClass(classId);
+
+        classMemberRepository.findByClazzAndUser(aClass, currentUser)
+                .filter(cm -> cm.getStatus() == ClassMemberStatus.APPROVED)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        String kw = (keyword == null) ? "" : keyword.toLowerCase().trim();
+        return classMemberRepository.findByClazzAndStatus(aClass, ClassMemberStatus.APPROVED)
+                .stream()
+                .filter(cm -> kw.isBlank() ||
+                        cm.getUser().getFullName().toLowerCase().contains(kw) ||
+                        cm.getUser().getUsername().toLowerCase().contains(kw))
+                .map(classMapper::toClassMemberResponse)
+                .collect(Collectors.toList());
+    }
+
+    // UC-24: Cập nhật quyền thành viên
+    @Transactional
+    public void updateMemberRole(UUID classId, UUID userId, ClassMemberRole newRole) {
+        User currentUser = getCurrentUser();
+        Class aClass = getActiveClass(classId);
+
+        // Chỉ LEADER mới được thay đổi quyền
+        ClassMember currentMembership = classMemberRepository
+                .findByClazzAndUser(aClass, currentUser)
+                .filter(cm -> cm.getRole() == ClassMemberRole.LEADER)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_LEADER));
+
+        // Không được thay đổi quyền của chính mình
+        if (userId.equals(currentUser.getId()))
+            throw new AppException(ErrorCode.CLASS_CANNOT_CHANGE_LEADER_ROLE);
+
+        User targetUser = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        ClassMember membership = classMemberRepository
+                .findByClazzAndUser(aClass, targetUser)
+                .filter(cm -> cm.getStatus() == ClassMemberStatus.APPROVED)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_MEMBER_NOT_FOUND));
+
+        // Nếu nâng lên LEADER → hạ người hiện tại xuống MEMBER (chuyển giao)
+        if (newRole == ClassMemberRole.LEADER) {
+            currentMembership.setRole(ClassMemberRole.MEMBER);
+            classMemberRepository.save(currentMembership);
+        }
+
+        membership.setRole(newRole);
+        classMemberRepository.save(membership);
+
+        sendNotification(
+                targetUser,
+                "Quyền của bạn trong lớp " + aClass.getName() + " đã được cập nhật thành " + newRole.name(),
+                "ROLE_UPDATED",
+                aClass.getId()
+        );
+    }
+
+    // UC-17: Xem danh sách bộ Flashcard trong lớp
+    // UC-22: Tìm kiếm bộ Flashcard trong lớp
+    public List<FlashCardSetResponse> getClassFlashCardSets(UUID classId, String keyword) {
+        User currentUser = getCurrentUser();
+        Class aClass = getActiveClass(classId);
+
+        classMemberRepository.findByClazzAndUser(aClass, currentUser)
+                .filter(cm -> cm.getStatus() == ClassMemberStatus.APPROVED)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        List<FlashCardSet> sets;
+        if (keyword == null || keyword.isBlank()) {
+            sets = flashCardSetRepository.findByClazzAndDeletedFalse(aClass);
+        } else {
+            sets = flashCardSetRepository.searchByClassAndName(aClass, keyword.trim());
+        }
+
+        return sets.stream()
+                .map(flashCardSetMapper::toFlashCardSetResponse)
+                .collect(Collectors.toList());
+    }
+
+    // UC-18: Thêm bộ Flashcard vào lớp học
+    @Transactional
+    public FlashCardSetResponse addClassFlashCardSet(UUID classId, ClassFlashCardSetRequest request) {
+        User currentUser = getCurrentUser();
+        Class aClass = getActiveClass(classId);
+
+        classMemberRepository.findByClazzAndUser(aClass, currentUser)
+                .filter(cm -> cm.getStatus() == ClassMemberStatus.APPROVED)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        FlashCardSet flashCardSet = FlashCardSet.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .privacy(request.getPrivacy())
+                .user(currentUser)
+                .clazz(aClass)
+                .build();
+
+        return flashCardSetMapper.toFlashCardSetResponse(
+                flashCardSetRepository.save(flashCardSet)
+        );
+    }
+
+    // UC-19: Sửa bộ Flashcard trong lớp học
+    @Transactional
+    public FlashCardSetResponse updateClassFlashCardSet(UUID classId, UUID setId,
+                                                        ClassFlashCardSetRequest request) {
+        User currentUser = getCurrentUser();
+        Class aClass = getActiveClass(classId);
+
+        ClassMember membership = classMemberRepository.findByClazzAndUser(aClass, currentUser)
+                .filter(cm -> cm.getStatus() == ClassMemberStatus.APPROVED)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        FlashCardSet flashCardSet = flashCardSetRepository
+                .findByIdAndClazzAndDeletedFalse(setId, aClass)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_FLASHCARD_SET_NOT_FOUND));
+
+        // Chỉ Leader hoặc chủ sở hữu mới được sửa
+        boolean isLeader = membership.getRole() == ClassMemberRole.LEADER;
+        boolean isOwner  = flashCardSet.getUser().getId().equals(currentUser.getId());
+        if (!isLeader && !isOwner)
+            throw new AppException(ErrorCode.CLASS_FLASHCARD_SET_NO_PERMISSION);
+
+        flashCardSet.setName(request.getName());
+        flashCardSet.setDescription(request.getDescription());
+        flashCardSet.setPrivacy(request.getPrivacy());
+
+        return flashCardSetMapper.toFlashCardSetResponse(
+                flashCardSetRepository.save(flashCardSet)
+        );
+    }
+
+    // UC-20: Xóa bộ Flashcard trong lớp học
+    @Transactional
+    public void deleteClassFlashCardSet(UUID classId, UUID setId) {
+        User currentUser = getCurrentUser();
+        Class aClass = getActiveClass(classId);
+
+        ClassMember membership = classMemberRepository.findByClazzAndUser(aClass, currentUser)
+                .filter(cm -> cm.getStatus() == ClassMemberStatus.APPROVED)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        FlashCardSet flashCardSet = flashCardSetRepository
+                .findByIdAndClazzAndDeletedFalse(setId, aClass)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_FLASHCARD_SET_NOT_FOUND));
+
+        boolean isLeader = membership.getRole() == ClassMemberRole.LEADER;
+        boolean isOwner  = flashCardSet.getUser().getId().equals(currentUser.getId());
+        if (!isLeader && !isOwner)
+            throw new AppException(ErrorCode.CLASS_FLASHCARD_SET_NO_PERMISSION);
+
+        flashCardSet.setDeleted(true);
+        flashCardSetRepository.save(flashCardSet);
     }
 }

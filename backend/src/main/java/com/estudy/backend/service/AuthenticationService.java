@@ -18,6 +18,7 @@ import com.estudy.backend.mapper.UserMapper;
 import com.estudy.backend.repository.InvalidatedTokenRepository;
 import com.estudy.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -142,6 +143,15 @@ public class AuthenticationService {
 
         return AuthenticationResponse.builder().token(token).authenticated(true).build();
     }
+        // Helper: Lấy thông tin user đang đăng nhập từ JWT
+        public UserResponse getCurrentUser() {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            User user = userRepository.findByUsernameAndDeletedFalse(username)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+            return userMapper.toUserResponse(user);
+        }
 
     // =========================================================================
     // HELPERS
