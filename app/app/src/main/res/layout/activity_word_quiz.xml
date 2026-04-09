@@ -13,7 +13,8 @@
         android:background="@color/primary"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingHorizontal="8dp">
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
         <ImageButton
             android:id="@+id/btnBack"
@@ -50,7 +51,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:paddingTop="10dp"
         android:paddingBottom="6dp"
         android:background="@color/background">
@@ -170,10 +172,11 @@
                 android:orientation="vertical"
                 android:gravity="center"
                 android:padding="20dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="28dp"
                 android:elevation="2dp">
 
                 <TextView
+                    android:id="@+id/tvQuestionLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Choose the correct meaning"
@@ -227,15 +230,16 @@
                 android:background="@drawable/bg_option_default"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="14dp"
-                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="18dp"
+                android:layout_marginBottom="12dp"
                 android:clickable="true"
                 android:focusable="true">
 
                 <TextView
                     android:id="@+id/tvLabel1"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:text="A"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
@@ -262,15 +266,16 @@
                 android:background="@drawable/bg_option_default"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="14dp"
-                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="18dp"
+                android:layout_marginBottom="12dp"
                 android:clickable="true"
                 android:focusable="true">
 
                 <TextView
                     android:id="@+id/tvLabel2"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:text="B"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
@@ -297,15 +302,16 @@
                 android:background="@drawable/bg_option_default"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="14dp"
-                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="18dp"
+                android:layout_marginBottom="12dp"
                 android:clickable="true"
                 android:focusable="true">
 
                 <TextView
                     android:id="@+id/tvLabel3"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:text="C"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
@@ -332,15 +338,16 @@
                 android:background="@drawable/bg_option_default"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="14dp"
-                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="18dp"
+                android:layout_marginBottom="12dp"
                 android:clickable="true"
                 android:focusable="true">
 
                 <TextView
                     android:id="@+id/tvLabel4"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:text="D"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
