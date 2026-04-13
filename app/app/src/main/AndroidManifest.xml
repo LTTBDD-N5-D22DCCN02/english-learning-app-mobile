@@ -38,6 +38,9 @@
         <activity android:name=".controller.WordQuizActivity" android:exported="false" />
         <activity android:name=".controller.SessionResultActivity" android:exported="false" />
         <activity android:name=".controller.StatisticsActivity" android:exported="false" />
+        <activity
+            android:name=".controller.FlashCardImportActivity"
+            android:exported="false" />
 
     </application>
 

@@ -76,21 +76,24 @@ public class FlashCardSetOverviewActivity extends AppCompatActivity {
         btnSendComment    = findViewById(R.id.btnSendComment);
         btnAddCard        = findViewById(R.id.btnAddCard);
 
+        etComment         = findViewById(R.id.etComment);
+
         rvComments.setLayoutManager(new LinearLayoutManager(this));
 
-        // Nhấn vào box Flashcards → mở FlashCardSetDetailActivity (danh sách từ đầy đủ)
+        String currentSetId = getIntent().getStringExtra("flashcard_set_id");
+
+
         layoutFlashCards.setOnClickListener(v -> {
-            Intent intent = new Intent(this, FlashCardSetDetailActivity.class);
-            intent.putExtra("flashcard_set_id",   flashCardSetId);
-            intent.putExtra("flashcard_set_name", flashCardSetName);
+            Intent intent = new Intent(FlashCardSetOverviewActivity.this, FlashCardListActivity.class);
+            intent.putExtra("flashcard_set_id", currentSetId); // Truyền ID của Set
+            intent.putExtra("is_edit_mode", false);            // Chế độ chỉ xem
             startActivity(intent);
         });
 
-        // Nút + → mở FlashCardListActivity (thêm/sửa từ của bạn Vân)
         btnAddCard.setOnClickListener(v -> {
-            Intent intent = new Intent(this, FlashCardListActivity.class);
-            intent.putExtra("flashcard_set_id",   flashCardSetId);
-            intent.putExtra("flashcard_set_name", flashCardSetName);
+            Intent intent = new Intent(FlashCardSetOverviewActivity.this, FlashCardListActivity.class);
+            intent.putExtra("flashcard_set_id", currentSetId); // Truyền ID của Set
+            intent.putExtra("is_edit_mode", true);             // Bật chế độ thêm/sửa
             startActivity(intent);
         });
 

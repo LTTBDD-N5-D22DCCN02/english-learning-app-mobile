@@ -14,4 +14,12 @@ public class FlashCardResponse {
     public String getImage() { return image; }
     public String getIpa() { return ipa; }
     public String getExample() { return example; }
+
+    public void setId(String id) { this.id = id; }
+    public void setTerm(String term) { this.term = term; }
+    public void setDefinition(String definition) { this.definition = definition; }
+    public void setImage(String image) { this.image = image; }
+    public void setIpa(String ipa) { this.ipa = ipa; }
+    public void setExample(String example) { this.example = example; }
+
 }

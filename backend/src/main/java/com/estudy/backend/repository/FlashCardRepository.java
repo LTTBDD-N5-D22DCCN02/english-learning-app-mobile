@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -42,4 +43,21 @@ public interface FlashCardRepository extends JpaRepository<FlashCard, UUID> {
     """)
     List<FlashCard> findNewCardsBySetIds(@Param("userId") UUID userId,
                                          @Param("setIds") List<UUID> setIds);
+
+    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM FlashCard f " +
+            "WHERE f.flashCardSet.id = :setId AND LOWER(f.term) = LOWER(:term) " +
+            "AND f.deleted = false AND f.id != :excludeId")
+    boolean existsByFlashCardSetIdAndTermIgnoreCaseAndDeletedFalseAndIdNot(
+            @Param("setId") UUID setId, @Param("term") String term, @Param("excludeId") UUID excludeId);
+
+    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM FlashCard f " +
+            "WHERE f.flashCardSet.id = :setId AND LOWER(f.term) = LOWER(:term) AND f.deleted = false")
+    boolean existsByFlashCardSetIdAndTermIgnoreCaseAndDeletedFalse(
+            @Param("setId") UUID setId, @Param("term") String term);
+
+    @Query("SELECT COUNT(f) FROM FlashCard f WHERE f.flashCardSet.id = :setId AND f.deleted = false")
+    long countByFlashCardSetIdAndDeletedFalse(@Param("setId") UUID setId);
+
+    @Query("SELECT f FROM FlashCard f WHERE f.id = :id AND f.deleted = false")
+    Optional<FlashCard> findByIdAndDeletedFalse(@Param("id") UUID id);
 }
