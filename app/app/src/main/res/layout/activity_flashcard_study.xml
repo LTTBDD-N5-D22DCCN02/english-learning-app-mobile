@@ -91,15 +91,6 @@
                     android:textColor="@color/text_hint"
                     android:layout_marginBottom="8dp" />
 
-                <ImageView
-                    android:id="@+id/ivCardImage"
-                    android:layout_width="110dp"
-                    android:layout_height="80dp"
-                    android:scaleType="centerCrop"
-                    android:background="@drawable/bg_flashcard_box"
-                    android:layout_marginBottom="14dp"
-                    android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/tvCardFront"
                     android:layout_width="wrap_content"
@@ -128,6 +119,16 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     app:tint="@color/primary"
                     android:layout_marginTop="10dp" />
+
+                <!-- Ảnh minh họa: nằm dưới nút âm thanh -->
+                <ImageView
+                    android:id="@+id/ivCardImage"
+                    android:layout_width="160dp"
+                    android:layout_height="110dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_flashcard_box"
+                    android:layout_marginTop="14dp"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvTapHint"

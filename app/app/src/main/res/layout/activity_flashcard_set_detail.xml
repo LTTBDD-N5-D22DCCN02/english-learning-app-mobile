@@ -243,18 +243,34 @@
                     android:textStyle="bold"
                     android:textColor="@color/primary" />
 
-                <!-- Nút + thêm từ mới → FlashCardListActivity -->
+                <!-- Nút Edit Flashcards → mở FlashCardListActivity -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddFlashcard"
+                    android:id="@+id/btnEditFlashcards"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="+ Add a flashcard"
+                    android:text="EDIT FLASHCARDS"
                     android:textSize="12sp"
                     android:textColor="@color/white"
                     app:backgroundTint="@color/primary"
                     app:cornerRadius="18dp"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
+                    app:icon="@drawable/ic_edit"
+                    app:iconTint="@color/white"
+                    app:iconSize="14dp"
+                    app:iconPadding="4dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    style="@style/Widget.MaterialComponents.Button" />
+                
+                <!-- btnAddFlashcard ẩn để Java không crash -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddFlashcard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="+ Add a flashcard"
+                    android:textSize="12sp"
+                    android:visibility="gone"
                     style="@style/Widget.MaterialComponents.Button" />
             </LinearLayout>
 

@@ -252,13 +252,13 @@
                             <ImageView android:layout_width="16dp" android:layout_height="16dp"
                                 android:src="@drawable/ic_checklist"
                                 android:contentDescription="Total"
-                                app:tint="#378ADD"
+                                app:tint="#47B968"
                                 android:layout_marginEnd="6dp" />
                             <TextView
                                 android:id="@+id/tvTotalLabel"
                                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:text="T: 0"
-                                android:textSize="14sp" android:textColor="#378ADD"
+                                android:textSize="14sp" android:textColor="#47B968"
                                 android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>

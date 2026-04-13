@@ -34,6 +34,5 @@
     <color name="status_due">#E24B4A</color>
     <color name="status_new">#378ADD</color>
     <color name="status_done">#639922</color>
-    <color name="divider">#E0E0E0</color>
     <color name="error_red">#F44336</color>
 </resources>
