@@ -8,6 +8,7 @@ public class FlashCardSetDetailResponse {
     private String description;
     private String privacy;
     private String createdAt;
+    private String ownerUsername;
     private List<FlashCardResponse> flashCards;
     private List<CommentResponse> comments;
 
@@ -15,6 +16,7 @@ public class FlashCardSetDetailResponse {
     public String getName() { return name; }
     public String getDescription() { return description; }
     public String getPrivacy() { return privacy; }
+    public String getOwnerUsername() { return ownerUsername; }
     public List<FlashCardResponse> getFlashCards() { return flashCards; }
     public List<CommentResponse> getComments() { return comments; }
 }

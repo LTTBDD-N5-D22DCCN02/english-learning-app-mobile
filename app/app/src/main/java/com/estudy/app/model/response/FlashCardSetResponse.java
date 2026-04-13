@@ -2,6 +2,8 @@ package com.estudy.app.model.response;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class FlashCardSetResponse {
 
     private String id;
@@ -20,10 +22,13 @@ public class FlashCardSetResponse {
 
     // ==================== GETTERS ====================
 
+    private List<FlashCardResponse> flashCards;
+
     public String getId() { return id; }
     public String getName() { return name; }
     public String getDescription() { return description; }
     public String getPrivacy() { return privacy; }
+    public List<FlashCardResponse> getFlashCards() { return flashCards; }
     public String getCreatedAt() { return createdAt; }
 
     public String getOwnerId() {

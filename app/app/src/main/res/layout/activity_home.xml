@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/background">
 
-    <!-- Toolbar -->
+    <!-- ── Toolbar ── -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -24,6 +26,7 @@
             android:background="@drawable/bg_input"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:inputType="text"
             android:drawableStart="@android:drawable/ic_menu_search" />
 
         <ImageButton
@@ -32,7 +35,7 @@
             android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_agenda"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:tint="@color/primary"
+            app:tint="@color/primary"
             android:layout_marginStart="8dp" />
 
         <ImageButton
@@ -41,50 +44,197 @@
             android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_myplaces"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:tint="@color/primary"
+            app:tint="@color/primary"
             android:layout_marginStart="4dp" />
     </LinearLayout>
 
+    <!-- ── Nội dung cuộn ── -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@color/background">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingBottom="16dp">
 
-            <!-- Banner Study Now -->
-            <LinearLayout
-                android:id="@+id/layoutStudyNow"
+            <!-- ── Banner: Review today ── -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardReviewToday"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@drawable/bg_banner_primary"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginBottom="24dp">
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/primary">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Study right now!"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvTotalTerms"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0 terms"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
+                    <!-- Header xanh: icon sách + "Review today" -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:background="@color/primary"
+                        android:paddingVertical="12dp">
 
-            <!-- ══════════════════════════════════════════ -->
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_book_open"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Review today"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Body trắng -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <!-- 3 chỉ số trong 1 dải, ngăn bằng đường nét đứt dọc -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="72dp"
+                            android:orientation="horizontal"
+                            android:background="@drawable/bg_stats_row"
+                            android:layerType="software">
+
+                            <!-- Due -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+                                <TextView
+                                    android:id="@+id/tvDueCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="28sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/status_due" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Due"
+                                    android:textSize="11sp"
+                                    android:textColor="#94a3b8"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- Divider dọc nét đứt -->
+                            <com.estudy.app.utils.DashedDividerView
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent" />
+
+                            <!-- New -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+                                <TextView
+                                    android:id="@+id/tvNewCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="28sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/status_new" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="New"
+                                    android:textSize="11sp"
+                                    android:textColor="#94a3b8"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- Divider dọc nét đứt -->
+                            <com.estudy.app.utils.DashedDividerView
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent" />
+
+                            <!-- Done -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+                                <TextView
+                                    android:id="@+id/tvDoneCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="28sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/status_done" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Done"
+                                    android:textSize="11sp"
+                                    android:textColor="#94a3b8"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Divider ngang nét đứt -->
+                        <com.estudy.app.utils.DashedDividerView
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="10dp" />
+
+                        <!-- Nút Study right now! -->
+                        <Button
+                            android:id="@+id/btnStudyAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="38dp"
+                            android:layout_gravity="center_horizontal"
+                            android:text="Study right now!"
+                            android:textSize="13sp"
+                            android:textColor="#374151"
+                            android:backgroundTint="@color/white"
+                            android:paddingHorizontal="20dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            style="@style/Widget.Material3.Button.OutlinedButton" />
+
+                        <!-- tvTotalTerms ẩn (giữ để HomeActivity không crash) -->
+                        <TextView
+                            android:id="@+id/tvTotalTerms"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone" />
+                    </LinearLayout>
+                </LinearLayout>
+                
+            </com.google.android.material.card.MaterialCardView>
+                        <!-- ══════════════════════════════════════════ -->
             <!-- CLASSES SECTION (MỚI)                     -->
             <!-- ══════════════════════════════════════════ -->
             <LinearLayout
@@ -286,21 +436,22 @@
                         android:gravity="center" />
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- My Flashcard Sets -->
+            <!-- ── Section: My flashcard sets ── -->
+            <!-- Header: title + See all -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="10dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="My flashcard sets"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary" />
 
@@ -313,18 +464,86 @@
                     android:textSize="13sp" />
             </LinearLayout>
 
-            <!-- FlashCard Set Preview -->
+            <!-- Carousel ngang -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvFlashCardSets"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:layout_marginBottom="24dp" />
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="4dp"
+                android:layout_marginBottom="24dp"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Empty: My flashcard sets -->
+            <TextView
+                android:id="@+id/tvEmptySets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No flashcard sets yet. Create one!"
+                android:textSize="13sp"
+                android:textColor="#94a3b8"
+                android:gravity="center"
+                android:paddingVertical="12dp"
+                android:layout_marginBottom="24dp"
+                android:visibility="gone" />
+
+            <!-- ── Section: My classes ── -->
+            <!-- Header: title + See all -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="My classes"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/tvSeeAllClasses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="See all"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Carousel ngang classes -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvClasses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="4dp"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Empty: My classes -->
+            <TextView
+                android:id="@+id/tvEmptyClasses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You haven't joined any class yet."
+                android:textSize="13sp"
+                android:textColor="#94a3b8"
+                android:gravity="center"
+                android:paddingVertical="12dp"
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Nav -->
+    <!-- ── Bottom nav ── -->
     <include layout="@layout/bottom_nav" />
 
 </LinearLayout>

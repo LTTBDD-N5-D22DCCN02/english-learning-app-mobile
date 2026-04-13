@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F0F4F8">
+
+    <!-- ── Toolbar ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/primary"
+        android:paddingHorizontal="8dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_back_circle"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            app:tint="@color/white" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_chart_line"
+            android:contentDescription="Stats icon"
+            app:tint="@color/white"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Study Statistics"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="@color/white" />
+
+        <ProgressBar
+            android:id="@+id/progressBarStat"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:indeterminateTint="@color/white"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- ── Content ── -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="14dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="24dp">
+
+            <!-- ════════════════════════════════
+                 UC-STAT-01: Vocabulary Progress
+                 ════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                    android:src="@drawable/ic_book_open"
+                    android:contentDescription="Vocabulary progress"
+                    app:tint="@color/primary"
+                    android:layout_marginEnd="6dp" />
+                <TextView
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Vocabulary Progress"
+                    android:textSize="14sp" android:textStyle="bold"
+                    android:textColor="#1E293B" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="14dp">
+
+                <!-- Words learned — blue -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="7dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#EBF3FF"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+                        <TextView
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Words learned"
+                            android:textSize="12sp" android:textColor="#378ADD"
+                            android:textStyle="bold" />
+                        <LinearLayout
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:orientation="horizontal" android:gravity="center_vertical"
+                            android:layout_marginTop="6dp">
+                            <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                                android:src="@drawable/ic_book"
+                                android:contentDescription="Book icon"
+                                app:tint="#378ADD"
+                                android:layout_marginEnd="4dp" />
+                            <TextView
+                                android:id="@+id/tvWordsLearned"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="22sp" android:textStyle="bold"
+                                android:textColor="#378ADD" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Words mastered — green -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="7dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#EDFBF0"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+                        <TextView
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Words mastered"
+                            android:textSize="12sp" android:textColor="#27AE60"
+                            android:textStyle="bold" />
+                        <LinearLayout
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:orientation="horizontal" android:gravity="center_vertical"
+                            android:layout_marginTop="6dp">
+                            <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                                android:src="@drawable/ic_check_circle"
+                                android:contentDescription="Check icon"
+                                app:tint="#27AE60"
+                                android:layout_marginEnd="4dp" />
+                            <TextView
+                                android:id="@+id/tvWordsMastered"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="22sp" android:textStyle="bold"
+                                android:textColor="#27AE60" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- ════════════════════════════════
+                 UC-STAT-02: Answer Accuracy
+                 ════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                    android:src="@drawable/ic_target"
+                    android:contentDescription="Accuracy"
+                    app:tint="@color/primary"
+                    android:layout_marginEnd="6dp" />
+                <TextView
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Answer Accuracy"
+                    android:textSize="14sp" android:textStyle="bold"
+                    android:textColor="#1E293B" />
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E2E8F0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <!-- Ring view -->
+                    <com.estudy.app.utils.AccuracyRingView
+                        android:id="@+id/accuracyRing"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:layout_marginEnd="20dp" />
+
+                    <!-- F / T labels -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+                            <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                                android:src="@drawable/ic_warning_triangle"
+                                android:contentDescription="Wrong"
+                                app:tint="#E24B4A"
+                                android:layout_marginEnd="6dp" />
+                            <TextView
+                                android:id="@+id/tvWrongLabel"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="F: 0"
+                                android:textSize="14sp" android:textColor="#E24B4A"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                                android:src="@drawable/ic_checklist"
+                                android:contentDescription="Total"
+                                app:tint="#378ADD"
+                                android:layout_marginEnd="6dp" />
+                            <TextView
+                                android:id="@+id/tvTotalLabel"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="T: 0"
+                                android:textSize="14sp" android:textColor="#378ADD"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ════════════════════════════════
+                 UC-STAT-05: Accuracy Trend
+                 ════════════════════════════════ -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="#D1FAE5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <!-- Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                            android:src="@drawable/ic_trending_up"
+                            android:contentDescription="Trend"
+                            app:tint="#27AE60"
+                            android:layout_marginEnd="6dp" />
+                        <TextView
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Accuracy Trend"
+                            android:textSize="13sp" android:textStyle="bold"
+                            android:textColor="#1E293B" />
+
+                        <!-- Weekly toggle -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:orientation="horizontal"
+                            android:background="@drawable/bg_answer_area"
+                            android:paddingHorizontal="2dp">
+
+                            <TextView
+                                android:id="@+id/btnWeekly"
+                                android:layout_width="56dp"
+                                android:layout_height="match_parent"
+                                android:text="Weekly"
+                                android:textSize="10sp"
+                                android:gravity="center"
+                                android:textColor="@color/white"
+                                android:background="@drawable/bg_tab_selected_small" />
+
+                            <TextView
+                                android:id="@+id/btnMonthly"
+                                android:layout_width="60dp"
+                                android:layout_height="match_parent"
+                                android:text="Monthly"
+                                android:textSize="10sp"
+                                android:gravity="center"
+                                android:textColor="@color/primary"
+                                android:background="@android:color/transparent" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Line chart placeholder (reuse bar chart for accuracy line) -->
+                    <com.estudy.app.utils.StudyBarChartView
+                        android:id="@+id/accuracyTrendChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp" />
+
+                    <!-- Trend summary -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="8dp">
+
+                        <TextView
+                            android:id="@+id/tvAccuracyTrendIcon"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="➡️"
+                            android:textSize="18sp"
+                            android:layout_marginEnd="8dp" />
+                        <TextView
+                            android:id="@+id/tvAccuracyTrend"
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="—"
+                            android:textSize="12sp" android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:id="@+id/tvAvgAccuracy"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="—%"
+                            android:textSize="18sp" android:textStyle="bold"
+                            android:textColor="@color/primary" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ════════════════════════════════
+                 UC-STAT-03: Study Streak
+                 ════════════════════════════════ -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="#FFE4C8">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <!-- Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                            android:src="@drawable/ic_flame"
+                            android:contentDescription="Streak"
+                            app:tint="#F97316"
+                            android:layout_marginEnd="6dp" />
+                        <TextView
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Study Streak"
+                            android:textSize="13sp" android:textStyle="bold"
+                            android:textColor="#1E293B" />
+
+                        <!-- New record badge -->
+                        <LinearLayout
+                            android:id="@+id/badgeNewRecord"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_hint_button"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="3dp"
+                            android:visibility="gone">
+                            <ImageView android:layout_width="12dp" android:layout_height="12dp"
+                                android:src="@drawable/ic_trophy"
+                                android:contentDescription="Trophy"
+                                app:tint="#913A00"
+                                android:layout_marginEnd="4dp" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="New record!"
+                                android:textSize="10sp" android:textStyle="bold"
+                                android:textColor="#913A00" />
+                        </LinearLayout>
+
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                            android:src="@drawable/ic_refresh"
+                            android:contentDescription="Calendar"
+                            app:tint="@color/text_secondary"
+                            android:layout_marginStart="8dp" />
+                    </LinearLayout>
+
+                    <!-- Current + Longest -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Current streak — pink -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#FFF0F5"
+                            app:strokeWidth="0dp">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="12dp"
+                                android:gravity="center_horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Current streak"
+                                    android:textSize="11sp" android:textColor="#E11D6A" />
+                                <LinearLayout
+                                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:orientation="horizontal" android:gravity="center_vertical"
+                                    android:layout_marginTop="6dp">
+                                    <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                                        android:src="@drawable/ic_flame"
+                                        android:contentDescription="Flame"
+                                        app:tint="#E11D6A"
+                                        android:layout_marginEnd="4dp" />
+                                    <TextView
+                                        android:id="@+id/tvCurrentStreak"
+                                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                        android:text="0 days"
+                                        android:textSize="18sp" android:textStyle="bold"
+                                        android:textColor="#E11D6A" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Longest streak — yellow -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#FFFBEB"
+                            app:strokeWidth="0dp">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="12dp"
+                                android:gravity="center_horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Longest streak"
+                                    android:textSize="11sp" android:textColor="#D97706" />
+                                <LinearLayout
+                                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:orientation="horizontal" android:gravity="center_vertical"
+                                    android:layout_marginTop="6dp">
+                                    <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                                        android:src="@drawable/ic_trophy"
+                                        android:contentDescription="Trophy"
+                                        app:tint="#D97706"
+                                        android:layout_marginEnd="4dp" />
+                                    <TextView
+                                        android:id="@+id/tvLongestStreak"
+                                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                        android:text="0 days"
+                                        android:textSize="18sp" android:textStyle="bold"
+                                        android:textColor="#D97706" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ════════════════════════════════
+                 UC-STAT-04: Study Activity chart
+                 ════════════════════════════════ -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E2E8F0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <!-- Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                            android:src="@drawable/ic_bar_chart"
+                            android:contentDescription="Activity"
+                            app:tint="@color/primary"
+                            android:layout_marginEnd="6dp" />
+                        <TextView
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Study Activity"
+                            android:textSize="13sp" android:textStyle="bold"
+                            android:textColor="#1E293B" />
+
+                        <TextView
+                            android:id="@+id/tvActivityPeriod"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Weekly"
+                            android:textSize="11sp" android:textColor="@color/primary"
+                            android:background="@drawable/bg_answer_area"
+                            android:paddingHorizontal="10dp" android:paddingVertical="3dp" />
+                    </LinearLayout>
+
+                    <!-- Chart + Sum/Avg side -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <com.estudy.app.utils.StudyBarChartView
+                            android:id="@+id/barChart"
+                            android:layout_width="0dp"
+                            android:layout_height="110dp"
+                            android:layout_weight="1" />
+
+                        <LinearLayout
+                            android:layout_width="72dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginStart="10dp">
+
+                            <TextView
+                                android:id="@+id/tvActivitySum"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Sum: 0"
+                                android:textSize="12sp" android:textStyle="bold"
+                                android:textColor="#1E293B"
+                                android:layout_marginBottom="6dp" />
+                            <TextView
+                                android:id="@+id/tvActivityAvg"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Avg: 0/day"
+                                android:textSize="11sp"
+                                android:textColor="#F97316" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ════════════════════════════════
+                 UC-STAT-06: Flashcard Set Progress
+                 ════════════════════════════════ -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E2E8F0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <!-- Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                            android:src="@drawable/ic_folder"
+                            android:contentDescription="Flashcard sets"
+                            app:tint="@color/primary"
+                            android:layout_marginEnd="6dp" />
+                        <TextView
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Flashcard Set Progress"
+                            android:textSize="13sp" android:textStyle="bold"
+                            android:textColor="#1E293B" />
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                            android:src="@drawable/ic_play"
+                            android:contentDescription="See all"
+                            app:tint="@color/primary" />
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvSetProgress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ════════════════════════════════
+                 Quote of the day
+                 ════════════════════════════════ -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#EBF3FF"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:id="@+id/tvQuote"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="&quot;Small steps every day lead to big success.&quot;"
+                        android:textSize="14sp"
+                        android:textStyle="italic"
+                        android:textColor="#1E293B"
+                        android:gravity="center"
+                        android:lineSpacingMultiplier="1.4" />
+
+                    <ImageView
+                        android:id="@+id/ivQuoteHeart"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_heart"
+                        android:contentDescription="Like quote"
+                        app:tint="@color/primary"
+                        android:layout_marginTop="10dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Empty state -->
+            <LinearLayout
+                android:id="@+id/layoutStatEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="gone">
+
+                <ImageView android:layout_width="48dp" android:layout_height="48dp"
+                    android:src="@drawable/ic_bar_chart"
+                    android:contentDescription="No data"
+                    app:tint="@color/primary" />
+                <TextView
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="No statistics yet"
+                    android:textSize="15sp" android:textStyle="bold"
+                    android:textColor="#374151" android:gravity="center" />
+                <TextView
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Start learning to see your stats!"
+                    android:textSize="12sp"
+                    android:textColor="#94A3B8" android:gravity="center" />
+            </LinearLayout>
+
+            <!-- hidden compat IDs -->
+            <TextView android:id="@+id/tvAccuracy" android:layout_width="0dp"
+                android:layout_height="0dp" android:visibility="gone" />
+            <TextView android:id="@+id/tvTotalAnswers" android:layout_width="0dp"
+                android:layout_height="0dp" android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <include layout="@layout/bottom_nav" />
+</LinearLayout>

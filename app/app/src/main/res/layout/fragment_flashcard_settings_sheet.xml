@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <!-- Drag handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="6dp"
+        android:background="#DDDDDD" />
+
+    <!-- Title row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_settings"
+            app:tint="@color/text_secondary"
+            android:layout_marginEnd="10dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Setting - flashcard"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <ImageButton
+            android:id="@+id/btnCloseSettings"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/text_secondary" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <!-- Section: Từ vựng -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Từ vựng"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:layout_marginBottom="8dp" />
+
+        <RadioGroup
+            android:id="@+id/rgVocabFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rbNeedReview"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="Chưa nhớ"
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:buttonTint="@color/primary" />
+
+            <RadioButton
+                android:id="@+id/rbRemembered"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="Đã nhớ"
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:buttonTint="@color/primary" />
+
+            <RadioButton
+                android:id="@+id/rbAll"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="Tất cả"
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:buttonTint="@color/primary"
+                android:checked="true" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <!-- Divider với margin trái phải -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@color/divider" />
+
+    <!-- Section: Nghĩa của từ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="6dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nghĩa của từ"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/cbVietnamese"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Nghĩa tiếng Việt"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:buttonTint="@color/primary" />
+
+        <CheckBox
+            android:id="@+id/cbEnglish"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Nghĩa tiếng Anh"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:buttonTint="@color/primary" />
+
+        <CheckBox
+            android:id="@+id/cbImage"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Hình ảnh"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:buttonTint="@color/primary" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <!-- Thoát phiên học -->
+    <TextView
+        android:id="@+id/btnExitSession"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="Thoát phiên học"
+        android:textSize="15sp"
+        android:textColor="@color/error"
+        android:gravity="center"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginBottom="8dp" />
+
+</LinearLayout>

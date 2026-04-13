@@ -1,5 +1,6 @@
 package com.estudy.app.controller;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
@@ -10,6 +11,7 @@ import com.estudy.app.api.ApiService;
 import com.estudy.app.model.request.FlashCardSetRequest;
 import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.FlashCardSetResponse;
+import com.estudy.app.utils.BottomNavHelper;
 import com.estudy.app.utils.TokenManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,6 +29,7 @@ public class FlashCardSetCreateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard_set_create);
+        BottomNavHelper.setup(this, R.id.btnNavAdd);
 
         TokenManager tokenManager = new TokenManager(this);
         apiService = ApiClient.getInstance(tokenManager).create(ApiService.class);
@@ -74,9 +77,16 @@ public class FlashCardSetCreateActivity extends AppCompatActivity {
                 btnSave.setEnabled(true);
                 if (response.isSuccessful() && response.body() != null
                         && response.body().getResult() != null) {
+                    FlashCardSetResponse result = response.body().getResult();
                     Toast.makeText(FlashCardSetCreateActivity.this,
                             "Created successfully!", Toast.LENGTH_SHORT).show();
-                    finish();
+                    // Mở Overview của bộ vừa tạo
+                    Intent intent = new Intent(FlashCardSetCreateActivity.this,
+                            FlashCardSetOverviewActivity.class);
+                    intent.putExtra("flashcard_set_id",   result.getId());
+                    intent.putExtra("flashcard_set_name", result.getName());
+                    startActivity(intent);
+                    finish(); // finish Create → back stack: List → Overview
                 } else {
                     Toast.makeText(FlashCardSetCreateActivity.this,
                             "Create failed. Please try again.", Toast.LENGTH_SHORT).show();

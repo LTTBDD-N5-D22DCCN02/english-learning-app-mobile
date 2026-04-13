@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_popup_rounded"
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:gravity="center_vertical"
+    android:elevation="8dp">
+
+    <!-- Bookmark - ẩn khi là owner (set trong code) -->
+    <ImageButton
+        android:id="@+id/btnActSave"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_bookmark"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#1C1C1E"
+        android:padding="9dp" />
+
+    <!-- Download -->
+    <ImageButton
+        android:id="@+id/btnActDownload"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_download"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#1C1C1E"
+        android:padding="9dp" />
+
+    <!-- Share Link -->
+    <ImageButton
+        android:id="@+id/btnActShare"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_link"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#1C1C1E"
+        android:padding="9dp" />
+
+    <!-- Duplicate -->
+    <ImageButton
+        android:id="@+id/btnActDuplicate"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_copy"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#1C1C1E"
+        android:padding="9dp" />
+
+    <!-- Auto Play -->
+    <ImageButton
+        android:id="@+id/btnActPlay"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_play"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#1C1C1E"
+        android:padding="9dp" />
+
+    <!-- Edit - chỉ hiện khi isOwner (set trong code) -->
+    <ImageButton
+        android:id="@+id/btnActEdit"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#1C1C1E"
+        android:padding="9dp"
+        android:visibility="gone" />
+
+    <!-- Delete - chỉ hiện khi isOwner -->
+    <ImageButton
+        android:id="@+id/btnActDelete"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#E53935"
+        android:padding="9dp"
+        android:visibility="gone" />
+
+</LinearLayout>

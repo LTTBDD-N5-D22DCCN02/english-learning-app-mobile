@@ -1,6 +1,6 @@
 # EStudy PTIT
 
-> Ứng dụng học từ vựng tiếng Anh bằng Flashcard tích hợp AI — Dự án môn Lập trình Thiết bị Di động, Nhóm 5 D22DCCN02, PTIT
+> Ứng dụng học từ vựng tiếng Anh bằng Flashcard tích hợp AI — Dự án môn Lập trình Thiết bị Di động, Nhóm 5 D22CNPM02, PTIT
 
 ---
 
@@ -391,17 +391,17 @@ Database gồm 10 bảng, chia 3 nhóm chức năng:
 
 ## Phân công thành viên
 
-| Thành viên | Chức năng phụ trách                                                      |
-|---|--------------------------------------------------------------------------|
-| Đặng Huyền | Authentication (đăng ký, đăng nhập, Google OAuth), Quản lý Flashcard set |
-| Vân | Quản lý Flashcard (thêm, sửa, xóa, import hàng loạt)                     |
-| Hương | Học tập (4 chế độ học, Spaced Repetition) , Thống kê                     |
-| Yến | Lớp học (tạo lớp, quản lý thành viên, flashcard lớp), Thông báo          |
-| Đào Huyền | Quản lý người dùng, Tính năng AI (Gemini, chatbot)                       |
+| Thành viên           | Chức năng phụ trách                                                      |
+|----------------------|--------------------------------------------------------------------------|
+| Đặng Thị Huyền       | Authentication (đăng ký, đăng nhập, Google OAuth), Quản lý Flashcard set |
+| Nguyễn Thị Khánh Vân | Quản lý Flashcard (thêm, sửa, xóa, import hàng loạt)                     |
+| Trần Mai Hương       | Học tập (4 chế độ học, Spaced Repetition) , Thống kê                     |
+| Lê Thị Hải Yến       | Lớp học (tạo lớp, quản lý thành viên, flashcard lớp), Thông báo          |
+| Đào Thị Huyền        | Quản lý người dùng, Tính năng AI (Gemini, chatbot)                       |
 
 ---
 
-## Hướng phát triển
+## Hướng phát triển thêm
 
 - Đồng bộ phiên bản Web
 - Gamification (điểm thưởng, xếp hạng)

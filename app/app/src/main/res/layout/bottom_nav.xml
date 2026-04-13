@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="62dp"
     android:background="@color/primary"
     android:orientation="horizontal"
     android:gravity="center">
 
+    <!-- Home -->
+    <LinearLayout
+        android:id="@+id/btnNavHome"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
     <!-- Home -->
     <LinearLayout
         android:id="@+id/btnNavHome"
@@ -19,7 +27,7 @@
         <ImageView
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:src="@drawable/ic_home" />
+            android:src="@drawable/ic_nav_home" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -43,7 +51,7 @@
         <ImageView
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:src="@drawable/ic_folder" />
+            android:src="@drawable/ic_nav_folder" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -67,7 +75,7 @@
         <ImageView
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:src="@drawable/ic_add" />
+            android:src="@drawable/ic_nav_add" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -102,8 +110,8 @@
             android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <!-- Notifications -->
-    <LinearLayout
+    <!-- Notifications + badge đỏ -->
+    <FrameLayout
         android:id="@+id/btnNavNotif"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -115,16 +123,25 @@
         <ImageView
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:src="@drawable/ic_bell" />
+            android:src="@drawable/ic_nav_bell"
+            android:layout_gravity="center" />
 
+        <!-- Badge đỏ -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notif"
-            android:textColor="#BBFFFFFF"
-            android:textSize="10sp"
-            android:layout_marginTop="2dp" />
-    </LinearLayout>
+            android:id="@+id/tvNotifBadge"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="0"
+            android:textSize="9sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:background="@drawable/bg_badge_notif"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <!-- Stats -->
     <LinearLayout
@@ -139,7 +156,7 @@
         <ImageView
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:src="@drawable/ic_stats" />
+            android:src="@drawable/ic_nav_stats" />
 
         <TextView
             android:layout_width="wrap_content"

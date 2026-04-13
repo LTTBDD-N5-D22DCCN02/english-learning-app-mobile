@@ -38,6 +38,7 @@
 
         <activity android:name=".controller.FlashCardSetCreateActivity" />
         <activity android:name=".controller.FlashCardSetEditActivity" />
+        <activity android:name=".controller.FlashCardSetOverviewActivity" />
         <activity android:name=".controller.FlashCardSetDetailActivity" />
         <activity android:name=".controller.FlashCardListActivity" />
 
@@ -65,6 +66,17 @@
         <activity
             android:name=".controller.ClassSettingActivity"
             android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".controller.StudyTodayActivity" android:exported="false" />
+        <activity android:name=".controller.StudySetWordsActivity" android:exported="false" />
+        <activity android:name=".controller.SpellingActivity" android:exported="false" />
+        <activity android:name=".controller.FlashcardStudyActivity" android:exported="false" />
+        <activity android:name=".controller.MatchPairActivity" android:exported="false" />
+        <activity android:name=".controller.WordQuizActivity" android:exported="false" />
+        <activity android:name=".controller.SessionResultActivity" android:exported="false" />
+        <activity android:name=".controller.StatisticsActivity" android:exported="false" />
+        <activity
+            android:name=".controller.FlashCardImportActivity"
+            android:exported="false" />
 
     </application>
 

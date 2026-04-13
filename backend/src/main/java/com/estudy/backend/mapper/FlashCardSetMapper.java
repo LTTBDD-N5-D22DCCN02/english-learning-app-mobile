@@ -36,6 +36,9 @@ public interface FlashCardSetMapper {
     @Mapping(target = "ownerName", source = "user.fullName")
     FlashCardSetResponse toFlashCardSetResponse(FlashCardSet flashCardSet);
 
+    @Mapping(target = "flashCards", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "ownerUsername", ignore = true)
     FlashCardSetDetailResponse toFlashCardSetDetailResponse(FlashCardSet flashCardSet);
 
     FlashCardResponse toFlashCardResponse(FlashCard flashCard);
