@@ -31,6 +31,9 @@ public interface FlashCardSetMapper {
     @Mapping(target = "comments", ignore = true)
     void updateFlashCardSet(FlashCardSetRequest request, @MappingTarget FlashCardSet flashCardSet);
 
+    // THÊM annotation mapping vào method toFlashCardSetResponse:
+    @Mapping(target = "ownerId", source = "user.id")
+    @Mapping(target = "ownerName", source = "user.fullName")
     FlashCardSetResponse toFlashCardSetResponse(FlashCardSet flashCardSet);
 
     @Mapping(target = "flashCards", ignore = true)

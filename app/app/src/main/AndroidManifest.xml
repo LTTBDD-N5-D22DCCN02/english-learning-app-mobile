@@ -15,21 +15,57 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
-        <activity android:name=".controller.SplashActivity" android:exported="true">
+
+        <activity
+            android:name=".controller.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".controller.LoginActivity" />
         <activity android:name=".controller.RegisterActivity" />
-        <activity android:name=".controller.HomeActivity" />
-        <activity android:name=".controller.FlashCardSetListActivity" />
+
+        <activity
+            android:name=".controller.HomeActivity"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".controller.FlashCardSetListActivity"
+            android:windowSoftInputMode="adjustPan" />
+
         <activity android:name=".controller.FlashCardSetCreateActivity" />
         <activity android:name=".controller.FlashCardSetEditActivity" />
         <activity android:name=".controller.FlashCardSetOverviewActivity" />
         <activity android:name=".controller.FlashCardSetDetailActivity" />
         <activity android:name=".controller.FlashCardListActivity" />
+
+        <activity
+            android:name=".controller.MyClassesActivity"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".controller.CreateClassActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".controller.ClassDetailActivity" />
+        <activity
+            android:name=".controller.MemberListActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".controller.GroupManagementActivity" />
+        <activity android:name=".controller.AddMemberActivity" />
+        <activity android:name=".controller.ApproveRequestsActivity" />
+        <activity
+            android:name=".controller.ClassFlashcardSetsActivity"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".controller.DiscoverClassesActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".controller.ClassSettingActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".controller.StudyTodayActivity" android:exported="false" />
         <activity android:name=".controller.StudySetWordsActivity" android:exported="false" />
         <activity android:name=".controller.SpellingActivity" android:exported="false" />

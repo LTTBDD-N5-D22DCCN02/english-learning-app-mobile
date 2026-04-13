@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import com.estudy.backend.entity.Class;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ public class FlashCardSet {
     @Column(updatable = false, nullable = false)
     UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     String name;
 
     String description;
@@ -58,4 +59,9 @@ public class FlashCardSet {
 //    @OneToMany(mappedBy = "user")
 //    List<FlashCard> flashCards;
 //
+
+    // THÊM field vào class body (sau field `user`)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_id")
+    Class clazz;  // null = flashcard set cá nhân, not-null = thuộc lớp học
 }

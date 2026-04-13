@@ -18,4 +18,7 @@ public class FlashCardSetResponse {
     String description;
     Privacy privacy;
     LocalDateTime createdAt;
+    // THÊM field vào FlashCardSetResponse:
+    String ownerName;   // fullName của user tạo bộ flashcard
+    UUID ownerId;
 }
