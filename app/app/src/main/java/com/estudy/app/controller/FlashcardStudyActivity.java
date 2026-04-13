@@ -28,6 +28,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -324,8 +325,30 @@ public class FlashcardStudyActivity extends AppCompatActivity {
         if (tvCardIPA != null) tvCardIPA.setText(card.getIpa() != null ? card.getIpa() : "");
 
         if (ivCardImage != null) {
-            boolean hasImage = card.getImage() != null && !card.getImage().isEmpty();
-            ivCardImage.setVisibility(hasImage ? View.VISIBLE : View.GONE);
+            String imageData = card.getImage();
+            boolean hasImage = imageData != null && !imageData.isEmpty();
+            if (hasImage) {
+                ivCardImage.setVisibility(View.VISIBLE);
+                if (imageData.startsWith("data:image")) {
+                    // Base64
+                    try {
+                        String b64 = imageData.substring(imageData.indexOf(",") + 1);
+                        byte[] bytes = android.util.Base64.decode(b64, android.util.Base64.DEFAULT);
+                        Glide.with(this).load(bytes)
+                                .centerCrop()
+                                .into(ivCardImage);
+                    } catch (Exception e) {
+                        ivCardImage.setVisibility(View.GONE);
+                    }
+                } else {
+                    // URL thường
+                    Glide.with(this).load(imageData)
+                            .centerCrop()
+                            .into(ivCardImage);
+                }
+            } else {
+                ivCardImage.setVisibility(View.GONE);
+            }
         }
 
         layoutFront.setVisibility(View.VISIBLE);

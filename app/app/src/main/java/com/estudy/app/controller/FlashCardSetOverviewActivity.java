@@ -102,10 +102,10 @@ public class FlashCardSetOverviewActivity extends AppCompatActivity {
 
 
         layoutFlashCards.setOnClickListener(v -> {
-            Intent intent = new Intent(FlashCardSetOverviewActivity.this, FlashCardListActivity.class);
-            intent.putExtra("flashcard_set_id", currentSetId); // Truyền ID của Set
-            intent.putExtra("is_edit_mode", false);            // Chế độ chỉ xem
-            cardListLauncher.launch(intent);
+            Intent intent = new Intent(FlashCardSetOverviewActivity.this, FlashCardSetDetailActivity.class);
+            intent.putExtra("flashcard_set_id",   flashCardSetId);
+            intent.putExtra("flashcard_set_name", flashCardSetName);
+            startActivity(intent);
         });
 
         btnAddCard.setOnClickListener(v -> {

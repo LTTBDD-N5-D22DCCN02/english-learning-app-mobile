@@ -14,14 +14,6 @@
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical"
-    <!-- Home -->
-    <LinearLayout
-        android:id="@+id/btnNavHome"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
