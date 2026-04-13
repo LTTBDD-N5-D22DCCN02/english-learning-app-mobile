@@ -5,10 +5,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.estudy.app.R;
 import com.estudy.app.model.response.FlashCardSetResponse;
+
 import java.util.List;
 
 public class FlashCardSetAdapter extends RecyclerView.Adapter<FlashCardSetAdapter.ViewHolder> {
@@ -26,9 +29,9 @@ public class FlashCardSetAdapter extends RecyclerView.Adapter<FlashCardSetAdapte
                                OnItemClickListener onItemClick,
                                OnItemClickListener onEditClick,
                                OnItemClickListener onDeleteClick) {
-        this.items = items;
-        this.onItemClick = onItemClick;
-        this.onEditClick = onEditClick;
+        this.items         = items;
+        this.onItemClick   = onItemClick;
+        this.onEditClick   = onEditClick;
         this.onDeleteClick = onDeleteClick;
     }
 
@@ -45,20 +48,41 @@ public class FlashCardSetAdapter extends RecyclerView.Adapter<FlashCardSetAdapte
         FlashCardSetResponse item = items.get(position);
 
         holder.tvName.setText(item.getName());
-        holder.tvDescription.setText("Description: " + (item.getDescription() != null ? item.getDescription() : "-"));
-        holder.tvPrivacy.setText("Privacy: " + (item.getPrivacy() != null ? item.getPrivacy().toLowerCase() : "-"));
+        holder.tvDescription.setText(
+                item.getDescription() != null && !item.getDescription().isEmpty()
+                        ? item.getDescription() : "No description");
+        holder.tvPrivacy.setText(
+                "Privacy: " + (item.getPrivacy() != null
+                        ? item.getPrivacy().toLowerCase() : "-"));
 
-        holder.itemView.setOnClickListener(v -> onItemClick.onClick(item));
+        // FIX 2: Click item → xem danh sách flashcard (VIEW mode)
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClick != null) onItemClick.onClick(item);
+        });
 
+
+        int count = item.getFlashCards() != null ? item.getFlashCards().size() : 0;
+
+        if (holder.tvCardCount != null) {
+            holder.tvCardCount.setText(count + " cards");
+        }
+
+        // FIX 2: 3 chấm → popup có đủ 3 tùy chọn
         holder.tvDotMenu.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(v.getContext(), v);
-            popup.getMenu().add(0, 0, 0, "Edit");
-            popup.getMenu().add(0, 1, 1, "Delete");
+            // Thêm đủ 3 menu items
+            popup.getMenu().add(0, R.id.menu_view,   0, "View flashcards");
+            popup.getMenu().add(0, R.id.menu_edit,   1, "Edit");
+            popup.getMenu().add(0, R.id.menu_delete, 2, "Delete");
+
             popup.setOnMenuItemClickListener(menuItem -> {
-                if (menuItem.getItemId() == 0) {
-                    onEditClick.onClick(item);
-                } else {
-                    onDeleteClick.onClick(item);
+                int id = menuItem.getItemId();
+                if (id == R.id.menu_view) {
+                    if (onItemClick != null) onItemClick.onClick(item);
+                } else if (id == R.id.menu_edit) {
+                    if (onEditClick != null) onEditClick.onClick(item);
+                } else if (id == R.id.menu_delete) {
+                    if (onDeleteClick != null) onDeleteClick.onClick(item);
                 }
                 return true;
             });
@@ -67,19 +91,26 @@ public class FlashCardSetAdapter extends RecyclerView.Adapter<FlashCardSetAdapte
     }
 
     @Override
-    public int getItemCount() {
-        return items.size();
+    public int getItemCount() { return items.size(); }
+
+    /** Xóa item khỏi list sau khi API delete thành công */
+    public void removeItem(int position) {
+        items.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, items.size() - position);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDescription, tvPrivacy, tvDotMenu;
+        TextView tvCardCount;
 
         ViewHolder(View itemView) {
             super(itemView);
-            tvName = itemView.findViewById(R.id.tvName);
+            tvName        = itemView.findViewById(R.id.tvName);
             tvDescription = itemView.findViewById(R.id.tvDescription);
-            tvPrivacy = itemView.findViewById(R.id.tvPrivacy);
-            tvDotMenu = itemView.findViewById(R.id.tvDotMenu);
+            tvPrivacy     = itemView.findViewById(R.id.tvPrivacy);
+            tvDotMenu     = itemView.findViewById(R.id.tvDotMenu);
+            tvCardCount = itemView.findViewById(R.id.tvCardCount);
         }
     }
 }

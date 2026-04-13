@@ -46,6 +46,24 @@ public class FlashCardSetOverviewActivity extends AppCompatActivity {
     private CommentAdapter commentAdapter;
     private List<CommentResponse> commentList = new ArrayList<>();
 
+    // BỘ THU TÍN HIỆU TỪ MÀN HÌNH DANH SÁCH THẺ (THÊM/XÓA/SỬA)
+    private final androidx.activity.result.ActivityResultLauncher<Intent> cardListLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    // 1. Tải lại API để tự update số cards (từ 2 lên 3) trên màn hình này
+                    loadDetail();
+
+                    // 2. Truyền tiếp lệnh báo thành công ra ngoài màn hình Trang chủ (SetListActivity)
+                    setResult(RESULT_OK);
+                }
+            });
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadDetail();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,22 +94,25 @@ public class FlashCardSetOverviewActivity extends AppCompatActivity {
         btnSendComment    = findViewById(R.id.btnSendComment);
         btnAddCard        = findViewById(R.id.btnAddCard);
 
+        etComment         = findViewById(R.id.etComment);
+
         rvComments.setLayoutManager(new LinearLayoutManager(this));
 
-        // Nhấn vào box Flashcards → mở FlashCardSetDetailActivity (danh sách từ đầy đủ)
+        String currentSetId = getIntent().getStringExtra("flashcard_set_id");
+
+
         layoutFlashCards.setOnClickListener(v -> {
-            Intent intent = new Intent(this, FlashCardSetDetailActivity.class);
-            intent.putExtra("flashcard_set_id",   flashCardSetId);
-            intent.putExtra("flashcard_set_name", flashCardSetName);
-            startActivity(intent);
+            Intent intent = new Intent(FlashCardSetOverviewActivity.this, FlashCardListActivity.class);
+            intent.putExtra("flashcard_set_id", currentSetId); // Truyền ID của Set
+            intent.putExtra("is_edit_mode", false);            // Chế độ chỉ xem
+            cardListLauncher.launch(intent);
         });
 
-        // Nút + → mở FlashCardListActivity (thêm/sửa từ của bạn Vân)
         btnAddCard.setOnClickListener(v -> {
-            Intent intent = new Intent(this, FlashCardListActivity.class);
-            intent.putExtra("flashcard_set_id",   flashCardSetId);
-            intent.putExtra("flashcard_set_name", flashCardSetName);
-            startActivity(intent);
+            Intent intent = new Intent(FlashCardSetOverviewActivity.this, FlashCardListActivity.class);
+            intent.putExtra("flashcard_set_id", currentSetId); // Truyền ID của Set
+            intent.putExtra("is_edit_mode", true);             // Bật chế độ thêm/sửa
+            cardListLauncher.launch(intent);
         });
 
         btnToggleComments.setOnClickListener(v -> toggleComments());

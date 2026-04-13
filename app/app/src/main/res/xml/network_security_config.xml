@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Đặt file này tại: res/xml/network_security_config.xml
+    Sau đó thêm vào AndroidManifest.xml trong thẻ <application>:
+    android:networkSecurityConfig="@xml/network_security_config"
+-->
+<network-security-config>
+    <!-- Cho phép cleartext (HTTP) với Pixabay để tải ảnh gợi ý -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">pixabay.com</domain>
+        <domain includeSubdomains="true">cdn.pixabay.com</domain>
+    </domain-config>
+    <!-- Mọi domain khác vẫn dùng HTTPS -->
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

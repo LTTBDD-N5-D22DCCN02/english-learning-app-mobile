@@ -19,4 +19,5 @@ public class FlashCardResponse {
     String ipa;
     String example;
     LocalDateTime createdAt;
+    private Long flashcardSetId;
 }

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header: position + delete -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/tvPosition"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:textColor="#9E9E9E"
+                android:text="1/1" />
+
+            <ImageButton
+                android:id="@+id/btnDeleteCard"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@android:drawable/ic_menu_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="#E53935"
+                android:contentDescription="Delete card" />
+        </LinearLayout>
+
+        <!-- Term label -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Term"
+            android:textSize="12sp"
+            android:textColor="#9E9E9E"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Term row: EditText + Suggest button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <EditText
+                android:id="@+id/etTerm"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_input_outlined"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textSize="14sp"
+                android:textColor="#212121"
+                android:hint="Enter term"
+                android:singleLine="true"
+                android:imeOptions="actionNext" />
+
+            <ImageButton
+                android:id="@+id/btnAudioEdit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="6dp"
+                android:src="@drawable/ic_speaker"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/primary"
+                android:contentDescription="Play audio" />
+
+            <ImageButton
+                android:id="@+id/btnSuggest"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:src="@android:drawable/ic_menu_search"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/primary"
+                android:contentDescription="Suggest definition" />
+        </LinearLayout>
+
+        <!-- Definition label -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Definition"
+            android:textSize="12sp"
+            android:textColor="#9E9E9E"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/etDefinition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="80dp"
+            android:background="@drawable/bg_input_outlined"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textSize="14sp"
+            android:textColor="#212121"
+            android:hint="(noun)&#10;/ipa/ definition..."
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Example label -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Example"
+            android:textSize="12sp"
+            android:textColor="#9E9E9E"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/etExample"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_input_outlined"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="14sp"
+            android:textColor="#212121"
+            android:hint="e.g. I use a ruler to draw straight lines."
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:layout_marginBottom="12dp" />
+
+        <!--
+            Image preview area (hiện khi có ảnh)
+            Gồm: ImageView + carousel buttons + nút re-upload + nút xóa ảnh
+        -->
+        <LinearLayout
+            android:id="@+id/layoutImagePreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="10dp">
+
+            <!-- Carousel row: prev + image + next -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/btnPrevImage"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@android:drawable/ic_media_previous"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:tint="#757575"
+                    android:visibility="invisible"
+                    android:contentDescription="Previous image" />
+
+                <ImageView
+                    android:id="@+id/ivCardImage"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop"
+                    android:background="#F5F5F5" />
+
+                <ImageButton
+                    android:id="@+id/btnNextImage"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@android:drawable/ic_media_next"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:tint="#757575"
+                    android:visibility="invisible"
+                    android:contentDescription="Next image" />
+            </LinearLayout>
+
+            <!-- Image action row: re-upload + delete -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:paddingTop="4dp">
+
+                <ImageButton
+                    android:id="@+id/btnReUploadImage"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@android:drawable/ic_menu_upload"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:tint="#757575"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Re-upload image" />
+
+                <ImageButton
+                    android:id="@+id/btnDeleteImage"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@android:drawable/ic_menu_delete"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:tint="#E53935"
+                    android:contentDescription="Delete image" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!--
+            Add image / Suggest image row (hiện khi chưa có ảnh)
+        -->
+        <LinearLayout
+            android:id="@+id/layoutImageButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <!-- Suggest image (tìm ảnh tự động theo term) -->
+            <ImageButton
+                android:id="@+id/btnAddImage"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="#757575"
+                android:contentDescription="Suggest image" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Suggest image"
+                android:textSize="13sp"
+                android:textColor="#757575"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="20dp" />
+
+            <!-- Upload image từ thư viện -->
+            <ImageButton
+                android:id="@+id/btnUploadImage"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_menu_upload"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="#757575"
+                android:contentDescription="Upload image" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload image"
+                android:textSize="13sp"
+                android:textColor="#757575"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+
+        <!-- Save button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveCard"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:text="Save"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/primary"
+            app:cornerRadius="22dp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -2,6 +2,8 @@ package com.estudy.app.api;
 
 import com.estudy.app.model.request.AnswerRequest;
 import com.estudy.app.model.request.CommentRequest;
+import com.estudy.app.model.request.FlashCardImportRequest;
+import com.estudy.app.model.request.FlashCardRequest;
 import com.estudy.app.model.request.FlashCardSetRequest;
 import com.estudy.app.model.request.LoginRequest;
 import com.estudy.app.model.request.LogoutRequest;
@@ -11,13 +13,16 @@ import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.AuthResponse;
 import com.estudy.app.model.response.CommentResponse;
 import com.estudy.app.model.response.DayActivityResponse;
+import com.estudy.app.model.response.FlashCardResponse;
 import com.estudy.app.model.response.FlashCardSetDetailResponse;
 import com.estudy.app.model.response.FlashCardSetResponse;
+import com.estudy.app.model.response.ImportResultResponse;
 import com.estudy.app.model.response.SessionResultResponse;
 import com.estudy.app.model.response.SetProgressResponse;
 import com.estudy.app.model.response.StartSessionResponse;
 import com.estudy.app.model.response.StatSummaryResponse;
 import com.estudy.app.model.response.StudyTodayResponse;
+import com.estudy.app.model.response.SuggestResponse;
 import com.estudy.app.model.response.UserResponse;
 
 import java.util.List;
@@ -64,6 +69,29 @@ public interface ApiService {
 
     @DELETE("flashcard-sets/comments/{commentId}")
     Call<ApiResponse<Void>> deleteComment(@Path("commentId") String commentId);
+
+
+    // ── FlashCards ──────────────────────────────────────────────────────────────
+
+    @GET("flashcards")
+    Call<ApiResponse<List<FlashCardResponse>>> getFlashCards(@Query("deck_id") String deckId);
+
+    @POST("flashcard-sets/{setId}/flashcards")
+    Call<ApiResponse<FlashCardResponse>> createFlashCard(
+            @Path("setId") String setId, @Body FlashCardRequest request);
+
+    @POST("flashcard-sets/{setId}/flashcards/import")
+    Call<ApiResponse<ImportResultResponse>> importFlashCards(
+            @Path("setId") String setId, @Body FlashCardImportRequest request);
+
+    @PUT("flashcards/{id}")
+    Call<ApiResponse<FlashCardResponse>> updateFlashCard(
+            @Path("id") String id, @Body FlashCardRequest request);
+
+
+
+    @GET("flashcards/suggest")
+    Call<ApiResponse<SuggestResponse>> suggest(@Query("term") String term);
 
     // ── UC-STUDY-01: Study Today ───────────────────────────────────────
     @GET("study/today")
