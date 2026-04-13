@@ -135,7 +135,11 @@ public class FlashCardImportActivity extends AppCompatActivity {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Import Result")
                 .setMessage(msg.toString())
-                .setPositiveButton("Done", (d, w) -> finish())
+                .setPositiveButton("Done", (d, w) -> {
+                    // PHÁT TÍN HIỆU THÀNH CÔNG VỀ MÀN HÌNH DANH SÁCH
+                    setResult(RESULT_OK);
+                    finish();
+                })
                 .show();
     }
 }

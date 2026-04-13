@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +30,13 @@ public class FlashCardSetListActivity extends AppCompatActivity {
     private ApiService apiService;
     private TokenManager tokenManager;
     private List<FlashCardSetResponse> flashCardSetList = new ArrayList<>();
+
+    // Bộ thu tín hiệu để tải lại Danh sách Bộ Thẻ
+    private final ActivityResultLauncher<Intent> listLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                // Tùy vào tên hàm tải dữ liệu của bạn, thường là loadSets() hoặc getAllSets()
+                loadFlashCardSets(); // Thay bằng hàm gọi API lấy danh sách bộ thẻ của bạn
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +98,8 @@ public class FlashCardSetListActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, FlashCardSetOverviewActivity.class);
                     intent.putExtra("flashcard_set_id", item.getId());
                     intent.putExtra("flashcard_set_name", item.getName());
-                    startActivity(intent);
+
+                    listLauncher.launch(intent);
                 },
                 // onClick edit
                 item -> {
@@ -97,7 +108,8 @@ public class FlashCardSetListActivity extends AppCompatActivity {
                     intent.putExtra("flashcard_set_name", item.getName());
                     intent.putExtra("flashcard_set_description", item.getDescription());
                     intent.putExtra("flashcard_set_privacy", item.getPrivacy());
-                    startActivity(intent);
+
+                    listLauncher.launch(intent);
                 },
                 // onClick delete
                 item -> deleteFlashCardSet(item.getId()));

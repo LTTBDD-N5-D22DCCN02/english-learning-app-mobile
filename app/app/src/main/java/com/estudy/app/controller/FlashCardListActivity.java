@@ -14,6 +14,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -62,11 +63,11 @@ public class FlashCardListActivity extends AppCompatActivity
     private View         layoutBottomActions;
     private View         layoutViewActions;
 
-    private ApiService    apiService;
-    private OkHttpClient  okHttpClient;   // FIX DNS: dùng OkHttp thay HttpURLConnection
-    private String        flashCardSetId;
-    private String        flashCardSetName;
-    private boolean       isEditMode;
+    private ApiService   apiService;
+    private OkHttpClient okHttpClient;
+    private String       flashCardSetId;
+    private String       flashCardSetName;
+    private boolean      isEditMode;
 
     private FlashCardAdapter adapter;
     private final List<FlashCardAdapter.CardData> cardList = new ArrayList<>();
@@ -83,9 +84,26 @@ public class FlashCardListActivity extends AppCompatActivity
                         && result.getData() != null && pendingImagePosition >= 0) {
                     String b64 = uriToBase64(result.getData().getData());
                     if (b64 != null) adapter.updateCardImage(pendingImagePosition, b64);
-                    else toast("Loi khi doc anh!");
+                    else toast("Lỗi khi đọc ảnh!");
                 }
                 pendingImagePosition = -1;
+            });
+
+    private final ActivityResultLauncher<Intent> importLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    loadFlashCards(); // Tải lại danh sách
+                }
+                suppressNextResume = false;
+            });
+
+    // Bộ thu tín hiệu khi từ màn hình Edit (Sửa/Thêm) quay trở về màn hình View
+    private final ActivityResultLauncher<Intent> editLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                // Nếu bên màn hình Edit có lưu, xóa hoặc đổi ảnh (RESULT_OK)
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    loadFlashCards(); // Gọi API tải lại danh sách thẻ mới nhất
+                }
             });
 
     @Override
@@ -94,7 +112,6 @@ public class FlashCardListActivity extends AppCompatActivity
         setContentView(R.layout.activity_flashcard_list);
         BottomNavHelper.setup(this, R.id.btnNavSets);
 
-        // FIX DNS: OkHttpClient khởi tạo 1 lần, dùng cho Pixabay
         okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
@@ -125,10 +142,11 @@ public class FlashCardListActivity extends AppCompatActivity
             layoutViewActions.setVisibility(View.VISIBLE);
             findViewById(R.id.btnGoToEdit).setOnClickListener(v -> {
                 Intent i = new Intent(this, FlashCardListActivity.class);
-                i.putExtra(EXTRA_SET_ID,    flashCardSetId);
-                i.putExtra(EXTRA_SET_NAME,  flashCardSetName);
+                i.putExtra(EXTRA_SET_ID,   flashCardSetId);
+                i.putExtra(EXTRA_SET_NAME, flashCardSetName);
                 i.putExtra(EXTRA_EDIT_MODE, true);
-                startActivity(i);
+
+                editLauncher.launch(i);
             });
         } else {
             layoutViewActions.setVisibility(View.GONE);
@@ -156,7 +174,7 @@ public class FlashCardListActivity extends AppCompatActivity
                 suppressNextResume = true;
                 Intent i = new Intent(this, FlashCardImportActivity.class);
                 i.putExtra(FlashCardImportActivity.EXTRA_SET_ID, flashCardSetId);
-                startActivity(i);
+                importLauncher.launch(i);
             });
         }
 
@@ -166,18 +184,14 @@ public class FlashCardListActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (isEditMode && suppressNextResume) {
-            suppressNextResume = false;
-            return;
-        }
+        if (isEditMode && suppressNextResume) { suppressNextResume = false; return; }
         if (isEditMode) loadFlashCards();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        executor.shutdownNow();
-    }
+    protected void onDestroy() { super.onDestroy(); executor.shutdownNow(); }
+
+    // ── Load ──────────────────────────────────────────────────────────────────
 
     private void loadFlashCards() {
         apiService.getFlashCardSetDetail(flashCardSetId)
@@ -192,15 +206,21 @@ public class FlashCardListActivity extends AppCompatActivity
                             flashCardSetName = detail.getName();
                             tvTitle.setText(flashCardSetName);
                         }
-                        List<FlashCardResponse> serverCards =
-                                detail.getFlashCards() != null ? detail.getFlashCards() : new ArrayList<>();
+                        // TẠO MỘT DANH SÁCH MỚI HOÀN TOÀN ĐỂ ĐƯỢC QUYỀN THÊM/XÓA
+                        List<FlashCardResponse> serverCards = new ArrayList<>();
+                        if (detail.getFlashCards() != null) {
+                            serverCards.addAll(detail.getFlashCards());
+                        }
                         if (isEditMode) {
                             cardList.clear();
                             for (FlashCardResponse r : serverCards)
                                 cardList.add(new FlashCardAdapter.CardData(r));
                             adapter.notifyDataSetChanged();
                         } else {
-                            rvFlashCards.setAdapter(new FlashCardAdapter(FlashCardListActivity.this, serverCards));                        }
+                            // VIEW mode: Phải gán vào biến 'adapter' trước để không bị NULL khi xóa
+                            adapter = new FlashCardAdapter(FlashCardListActivity.this, serverCards, FlashCardListActivity.this);
+                            rvFlashCards.setAdapter(adapter);
+                        }
                     }
                     @Override
                     public void onFailure(Call<ApiResponse<FlashCardSetDetailResponse>> call, Throwable t) {
@@ -208,6 +228,8 @@ public class FlashCardListActivity extends AppCompatActivity
                     }
                 });
     }
+
+    // ── onSave ────────────────────────────────────────────────────────────────
 
     @Override
     public void onSave(FlashCardAdapter.CardData card, int position) {
@@ -227,7 +249,9 @@ public class FlashCardListActivity extends AppCompatActivity
                             } else showApiError(response);
                         }
                         @Override
-                        public void onFailure(Call<ApiResponse<FlashCardResponse>> call, Throwable t) { toast("Network error"); }
+                        public void onFailure(Call<ApiResponse<FlashCardResponse>> call, Throwable t) {
+                            toast("Network error");
+                        }
                     });
         } else {
             apiService.updateFlashCard(card.id, req)
@@ -239,67 +263,93 @@ public class FlashCardListActivity extends AppCompatActivity
                             else showApiError(response);
                         }
                         @Override
-                        public void onFailure(Call<ApiResponse<FlashCardResponse>> call, Throwable t) { toast("Network error"); }
+                        public void onFailure(Call<ApiResponse<FlashCardResponse>> call, Throwable t) {
+                            toast("Network error");
+                        }
                     });
         }
     }
+
+    // ── onDelete ──────────────────────────────────────────────────────────────
 
     @Override
     public void onDelete(FlashCardAdapter.CardData card, int position) {
         new AlertDialog.Builder(this)
                 .setTitle("Delete flashcard")
-                .setMessage(TextUtils.isEmpty(card.term) ? "Delete this card?" : "Delete \"" + card.term + "\"?")
+                .setMessage(TextUtils.isEmpty(card.term)
+                        ? "Delete this card?" : "Delete \"" + card.term + "\"?")
                 .setPositiveButton("Delete", (d, w) -> {
                     if (card.isNew || card.id == null) {
                         adapter.removeCard(position);
                     } else {
-                        apiService.deleteFlashCard(card.id).enqueue(new Callback<ApiResponse<Void>>() {
-                            @Override
-                            public void onResponse(Call<ApiResponse<Void>> call, retrofit2.Response<ApiResponse<Void>> r) {
-                                if (r.isSuccessful()) { adapter.removeCard(position); setResult(RESULT_OK); toast("Deleted"); }
-                                else toast("Delete failed");
-                            }
-                            @Override
-                            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) { toast("Network error"); }
-                        });
+                        apiService.deleteFlashCard(card.id)
+                                .enqueue(new Callback<ApiResponse<Void>>() {
+                                    @Override
+                                    public void onResponse(Call<ApiResponse<Void>> call,
+                                                           retrofit2.Response<ApiResponse<Void>> r) {
+                                        if (r.isSuccessful()) {
+                                            adapter.removeCard(position);
+                                            setResult(RESULT_OK);
+                                            toast("Deleted");
+                                        } else toast("Delete failed");
+                                    }
+                                    @Override
+                                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                                        toast("Network error");
+                                    }
+                                });
                     }
                 })
                 .setNegativeButton("Cancel", null).show();
     }
 
-    @Override
-    public void onSuggest(int position, String term, FlashCardAdapter.SuggestCallback cb) {
-        toast("Đang dịch từ: " + term + "...");
+    // ── onSuggest — MULTI MEANING via SuggestDialog ───────────────────────────
 
+    @Override
+    public void onSuggest(int position, String term) {
+        toast("Đang tra từ: " + term + "...");
         apiService.suggest(term).enqueue(new Callback<ApiResponse<SuggestResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<SuggestResponse>> call,
                                    retrofit2.Response<ApiResponse<SuggestResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getResult() != null) {
-                    SuggestResponse s = response.body().getResult();
-                    cb.onResult(nvl(s.getDefinition()), nvl(s.getIpa()), nvl(s.getExample()));
-                    toast("Đã điền xong!");
-                } else {
-                    // ĐỌC CHÍNH XÁC LỖI TỪ SPRING BOOT
+                if (!response.isSuccessful() || response.body() == null
+                        || response.body().getResult() == null) {
+                    // Log lỗi chi tiết như code gốc
                     String errorMsg = "Lỗi HTTP " + response.code();
                     try {
-                        if (response.errorBody() != null) {
+                        if (response.errorBody() != null)
                             errorMsg += " - " + response.errorBody().string();
-                        }
                     } catch (Exception ignored) {}
-
-                    toast(errorMsg); // Bắn Toast báo lỗi lên màn hình
-                    android.util.Log.e("LOI_SUGGEST", "Chi tiết lỗi: " + errorMsg);
+                    toast(errorMsg);
+                    android.util.Log.e("SUGGEST", errorMsg);
+                    return;
                 }
+
+                SuggestResponse suggest = response.body().getResult();
+
+                if (suggest.meanings == null || suggest.meanings.isEmpty()) {
+                    toast("Không tìm thấy nghĩa cho \"" + term + "\"");
+                    return;
+                }
+
+                // Mở bottom sheet hiển thị TẤT CẢ các nghĩa
+                FragmentManager fm = getSupportFragmentManager();
+                SuggestDialog.newInstance(suggest, (definition, ipa, example) -> {
+                    // User chọn 1 nghĩa → điền vào card + refresh UI
+                    adapter.applySuggestion(position, definition, ipa, example);
+                    toast("Đã điền xong!");
+                }).show(fm, "suggest_dialog");
             }
 
             @Override
             public void onFailure(Call<ApiResponse<SuggestResponse>> call, Throwable t) {
                 toast("Lỗi kết nối Server: " + t.getMessage());
-                android.util.Log.e("LOI_SUGGEST", "Lỗi mạng: " + t.getMessage());
+                android.util.Log.e("SUGGEST", "Network: " + t.getMessage());
             }
         });
     }
+
+    // ── onImagePick ───────────────────────────────────────────────────────────
 
     @Override
     public void onImagePick(int position) {
@@ -308,10 +358,8 @@ public class FlashCardListActivity extends AppCompatActivity
                 new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
     }
 
-    /**
-     * FIX DNS: Dùng OkHttp (đã có sẵn qua Retrofit) thay HttpURLConnection.
-     * OkHttp có DNS fallback tốt hơn, resolve được pixabay.com trên emulator.
-     */
+    // ── onImageSuggest ────────────────────────────────────────────────────────
+
     @Override
     public void onImageSuggest(int position, String term) {
         toast("Searching images for \"" + term + "\"...");
@@ -327,31 +375,18 @@ public class FlashCardListActivity extends AppCompatActivity
 
     private List<String> fetchPixabay(String term) {
         try {
-            String encodedTerm = URLEncoder.encode(term, "UTF-8");
             String url = "https://pixabay.com/api/?key=" + PIXABAY_KEY
-                    + "&q=" + encodedTerm
+                    + "&q=" + URLEncoder.encode(term, "UTF-8")
                     + "&image_type=photo&per_page=10&safesearch=true";
-
-            Request request = new Request.Builder()
-                    .url(url)
-                    .addHeader("Accept", "application/json")
-                    .build();
-
-            // execute() là synchronous → gọi từ executor (background thread)
+            Request request = new Request.Builder().url(url)
+                    .addHeader("Accept", "application/json").build();
             Response response = okHttpClient.newCall(request).execute();
-
-            if (!response.isSuccessful() || response.body() == null) {
-                int code = response.code();
-                runOnUiThread(() -> toast("Pixabay error: " + code));
-                return null;
-            }
-
+            if (!response.isSuccessful() || response.body() == null) return null;
             JSONArray hits = new JSONObject(response.body().string()).getJSONArray("hits");
             List<String> result = new ArrayList<>();
             for (int i = 0; i < Math.min(10, hits.length()); i++)
                 result.add(hits.getJSONObject(i).getString("webformatURL"));
             return result;
-
         } catch (Exception e) {
             runOnUiThread(() -> toast("Image error: " + e.getMessage()));
             return null;
@@ -359,6 +394,8 @@ public class FlashCardListActivity extends AppCompatActivity
     }
 
     @Override public void onImageDelete(int position) { }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private void saveAllUnsaved() {
         for (int i = 0; i < cardList.size(); i++) {
@@ -381,10 +418,27 @@ public class FlashCardListActivity extends AppCompatActivity
     private void toast(String msg) { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
 
     private void showApiError(retrofit2.Response<?> r) {
-        String msg = "Error " + r.code();
-        try { if (r.errorBody() != null) msg = r.errorBody().string(); } catch (IOException ignored) {}
-        toast(msg);
-    }
+        String msg = "Lỗi HTTP " + r.code();
+        try {
+            if (r.errorBody() != null) {
+                String errorString = r.errorBody().string();
+                try {
+                    // Cố gắng bóc tách JSON lỗi của Spring Boot để lấy lời nhắn thực sự
+                    JSONObject jsonObject = new JSONObject(errorString);
+                    if (jsonObject.has("message")) {
+                        msg = jsonObject.getString("message"); // Lấy dòng "A flashcard with this term already exists..."
+                    } else if (jsonObject.has("error")) {
+                        msg = jsonObject.getString("error");
+                    } else {
+                        msg = errorString;
+                    }
+                } catch (Exception e) {
+                    // Nếu lỗi không phải dạng JSON thì in ra nguyên gốc
+                    msg = errorString;
+                }
+            }
+        } catch (IOException ignored) {}
 
-    private String nvl(String s) { return s != null ? s : ""; }
+        toast(msg); // Hiện thông báo lỗi chuẩn xác lên màn hình
+    }
 }

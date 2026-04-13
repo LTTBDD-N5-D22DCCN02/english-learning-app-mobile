@@ -60,6 +60,13 @@ public class FlashCardSetAdapter extends RecyclerView.Adapter<FlashCardSetAdapte
             if (onItemClick != null) onItemClick.onClick(item);
         });
 
+
+        int count = item.getFlashCards() != null ? item.getFlashCards().size() : 0;
+
+        if (holder.tvCardCount != null) {
+            holder.tvCardCount.setText(count + " cards");
+        }
+
         // FIX 2: 3 chấm → popup có đủ 3 tùy chọn
         holder.tvDotMenu.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(v.getContext(), v);
@@ -90,11 +97,12 @@ public class FlashCardSetAdapter extends RecyclerView.Adapter<FlashCardSetAdapte
     public void removeItem(int position) {
         items.remove(position);
         notifyItemRemoved(position);
-        notifyItemRangeChanged(position, items.size());
+        notifyItemRangeChanged(position, items.size() - position);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDescription, tvPrivacy, tvDotMenu;
+        TextView tvCardCount;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -102,6 +110,7 @@ public class FlashCardSetAdapter extends RecyclerView.Adapter<FlashCardSetAdapte
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvPrivacy     = itemView.findViewById(R.id.tvPrivacy);
             tvDotMenu     = itemView.findViewById(R.id.tvDotMenu);
+            tvCardCount = itemView.findViewById(R.id.tvCardCount);
         }
     }
 }
