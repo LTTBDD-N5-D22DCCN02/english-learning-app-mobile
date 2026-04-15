@@ -2,8 +2,10 @@ package com.estudy.app.controller;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
+import android.widget.PopupWindow;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -89,7 +91,7 @@ public class HomeActivity extends AppCompatActivity {
         ImageButton btnProfile = findViewById(R.id.btnProfile);
         btnLibrary.setOnClickListener(v ->
                 startActivity(new Intent(this, FlashCardSetListActivity.class)));
-        btnProfile.setOnClickListener(v -> showLogoutDialog());
+        btnProfile.setOnClickListener(v -> showProfileMenu());
 
         // See all links
         tvSeeAllSets.setOnClickListener(v ->
@@ -202,6 +204,39 @@ public class HomeActivity extends AppCompatActivity {
     private void showEmptyClasses() {
         rvClasses.setVisibility(View.GONE);
         tvEmptyClasses.setVisibility(View.VISIBLE);
+    }
+
+    // ─────────────────────────────────────────────────
+    // Profile menu: View Profile / Logout
+    // ─────────────────────────────────────────────────
+    private void showProfileMenu() {
+        View popupView = LayoutInflater.from(this)
+                .inflate(R.layout.popup_profile_actions, null);
+
+        PopupWindow popup = new PopupWindow(
+                popupView,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                true
+        );
+        popup.setElevation(12f);
+        popup.setOutsideTouchable(true);
+        popup.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(
+                android.graphics.Color.TRANSPARENT));
+
+        popupView.findViewById(R.id.btnViewProfile).setOnClickListener(v -> {
+            popup.dismiss();
+            startActivity(new Intent(this, ProfileActivity.class));
+        });
+
+        popupView.findViewById(R.id.btnLogout).setOnClickListener(v -> {
+            popup.dismiss();
+            showLogoutDialog();
+        });
+
+        // Anchor popup bên dưới icon btnProfile, căn phải
+        View anchor = findViewById(R.id.btnProfile);
+        popup.showAsDropDown(anchor, 0, 8);
     }
 
     // ─────────

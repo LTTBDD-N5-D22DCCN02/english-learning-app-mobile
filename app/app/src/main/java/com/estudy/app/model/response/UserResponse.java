@@ -16,4 +16,5 @@ public class UserResponse {
     public String getFullName() { return fullName; }
     public String getPhone() { return phone; }
     public String getGender() { return gender; }
+    public String getDob()    { return dob; }
 }

@@ -7,6 +7,7 @@ import com.estudy.app.model.request.LoginRequest;
 import com.estudy.app.model.request.LogoutRequest;
 import com.estudy.app.model.request.RegisterRequest;
 import com.estudy.app.model.request.StartSessionRequest;
+import com.estudy.app.model.request.UpdateProfileRequest;
 import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.AuthResponse;
 import com.estudy.app.model.response.CommentResponse;
@@ -96,4 +97,12 @@ public interface ApiService {
     // ── UC-STAT-06: Set Progress ──────────────────────────────────────
     @GET("study/stats/sets")
     Call<ApiResponse<List<SetProgressResponse>>> getSetProgress();
+
+    // ── UC-01: Xem thông tin cá nhân ──────────────────────────────────
+    @GET("users/me")
+    Call<ApiResponse<UserResponse>> getMyProfile();
+
+    // ── UC-02: Sửa thông tin cá nhân ─────────────────────────────────
+    @PUT("users/me")
+    Call<ApiResponse<UserResponse>> updateProfile(@Body UpdateProfileRequest request);
 }
