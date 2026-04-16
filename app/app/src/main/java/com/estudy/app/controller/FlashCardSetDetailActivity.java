@@ -36,6 +36,7 @@ public class FlashCardSetDetailActivity extends AppCompatActivity {
     private ImageButton btnMore, btnFilter, btnStudy;
     private EditText etSearch;
     private com.google.android.material.button.MaterialButton btnAddFlashcard;
+    private com.google.android.material.button.MaterialButton btnEditFlashcards;
 
     private ApiService apiService;
     private TokenManager tokenManager;
@@ -98,6 +99,7 @@ public class FlashCardSetDetailActivity extends AppCompatActivity {
         btnStudy           = findViewById(R.id.btnStudy);
         etSearch           = findViewById(R.id.etSearch);
         btnAddFlashcard    = findViewById(R.id.btnAddFlashcard);
+        btnEditFlashcards  = findViewById(R.id.btnEditFlashcards);
 
         rvFlashCards.setLayoutManager(new LinearLayoutManager(this));
         rvFlashCards.setNestedScrollingEnabled(false);
@@ -139,6 +141,14 @@ public class FlashCardSetDetailActivity extends AppCompatActivity {
                                 getIntent().getStringExtra("flashcard_set_name"))
                         .show(getSupportFragmentManager(), "StudyMode"));
         if (btnMore   != null) btnMore.setOnClickListener(v -> showMoreMenu());
+        if (btnEditFlashcards != null) btnEditFlashcards.setOnClickListener(v -> {
+            android.content.Intent i = new android.content.Intent(this, FlashCardListActivity.class);
+            i.putExtra("flashcard_set_id",   flashCardSetId);
+            i.putExtra("flashcard_set_name", getIntent().getStringExtra("flashcard_set_name"));
+            i.putExtra("is_edit_mode", true);  // Mở thẳng chế độ edit có Add/Import
+            startActivity(i);
+        });
+
         if (btnAddFlashcard != null) btnAddFlashcard.setOnClickListener(v -> {
             android.content.Intent i = new android.content.Intent(this, FlashCardListActivity.class);
             i.putExtra("flashcard_set_id",   flashCardSetId);

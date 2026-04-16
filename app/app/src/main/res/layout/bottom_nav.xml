@@ -20,9 +20,17 @@
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:src="@drawable/ic_nav_home" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <!-- Cards / Sets -->
+    <!-- Flashcard Sets -->
     <LinearLayout
         android:id="@+id/btnNavSets"
         android:layout_width="0dp"
@@ -36,9 +44,17 @@
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:src="@drawable/ic_nav_folder" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sets"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <!-- Add (nút giữa) -->
+    <!-- Add -->
     <LinearLayout
         android:id="@+id/btnNavAdd"
         android:layout_width="0dp"
@@ -49,9 +65,41 @@
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:src="@drawable/ic_nav_add" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- Classes (MỚI) -->
+    <LinearLayout
+        android:id="@+id/btnNavClasses"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_class" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Classes"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
     <!-- Notifications + badge đỏ -->
@@ -61,6 +109,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
+        android:orientation="vertical"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
@@ -100,6 +149,14 @@
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:src="@drawable/ic_nav_stats" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stats"
+            android:textColor="#BBFFFFFF"
+            android:textSize="10sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
 </LinearLayout>

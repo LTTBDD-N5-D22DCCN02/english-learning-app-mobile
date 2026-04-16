@@ -9,10 +9,7 @@ import com.estudy.backend.dto.response.IntrospectResponse;
 import com.estudy.backend.dto.response.UserResponse;
 import com.estudy.backend.service.AuthenticationService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.nimbusds.jose.JOSEException;
 
@@ -62,5 +59,12 @@ public class AuthenticationController {
         authenticationService.logout(request);
 
         return ApiResponse.<Void>builder().build();
+    }
+
+    @GetMapping("/auth/me")
+    ApiResponse<UserResponse> getCurrentUser() {
+        return ApiResponse.<UserResponse>builder()
+                .result(authenticationService.getCurrentUser())
+                .build();
     }
 }

@@ -10,4 +10,8 @@ public class FlashCardSetRequest {
         this.description = description;
         this.privacy = privacy;
     }
+
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public String getPrivacy() { return privacy; }
 }

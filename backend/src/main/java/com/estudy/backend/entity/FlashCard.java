@@ -25,12 +25,16 @@ public class FlashCard {
     @Column(nullable = false)
     String term;
 
+    @Column(columnDefinition = "TEXT")
     String definition;
 
+    @Column(columnDefinition = "LONGTEXT")
     String image;
 
+    @Column(columnDefinition = "TEXT")
     String ipa;
 
+    @Column(columnDefinition = "TEXT")
     String example;
 
     @Builder.Default
