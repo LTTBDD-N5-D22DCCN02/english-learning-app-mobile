@@ -90,6 +90,11 @@ public enum ErrorCode {
     CLASS_INVALID_ROLE(3112, "Invalid role. Only ADMIN or MEMBER roles can be assigned", HttpStatus.BAD_REQUEST),
     // Thêm vào phần CLASS
     CLASS_NAME_DUPLICATED(3113, "Class name already exists", HttpStatus.BAD_REQUEST),
+
+    // ==========================
+    // NOTIFICATION
+    // ==========================
+    NOTIFICATION_NOT_FOUND(4100, "Notification not found", HttpStatus.NOT_FOUND),
     ;
 
     private final int code;

@@ -17,6 +17,7 @@ import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.ClassResponse;
 import com.estudy.app.model.response.FlashCardSetResponse;
 import com.estudy.app.model.response.StudyTodayResponse;
+import com.estudy.app.utils.BottomNavHelper;
 import com.estudy.app.utils.TokenManager;
 import java.util.List;
 import retrofit2.Call;
@@ -56,6 +57,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadData();
+        BottomNavHelper.loadBadge(this, apiService);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -142,7 +144,7 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(this, FlashCardSetCreateActivity.class)));
         if (btnNavClasses != null) btnNavClasses.setOnClickListener(v -> goToMyClasses());
         if (btnNavNotif   != null) btnNavNotif.setOnClickListener(v ->
-                Toast.makeText(this, "Notifications coming soon", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, NotificationActivity.class)));
         if (btnNavStats   != null) btnNavStats.setOnClickListener(v ->
                 startActivity(new Intent(this, StatisticsActivity.class)));
     }

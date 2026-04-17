@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:elevation="8dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/primary"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Filter"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_delete"
+            android:background="@null"
+            android:padding="6dp"
+            android:tint="@color/white" />
+    </LinearLayout>
+
+    <!-- Options -->
+    <TextView
+        android:id="@+id/btnFilterAll"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="All"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:textColor="@color/text_primary"
+        android:background="@color/input_background" />
+
+    <TextView
+        android:id="@+id/btnFilterClasses"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Classes"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:textColor="@color/text_primary"
+        android:background="@null" />
+
+    <TextView
+        android:id="@+id/btnFilterSystems"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Systems"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:textColor="@color/text_primary"
+        android:background="@null" />
+
+    <TextView
+        android:id="@+id/btnFilterFlashcardSets"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Flashcard Sets"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:textColor="@color/text_primary"
+        android:background="@null" />
+</LinearLayout>

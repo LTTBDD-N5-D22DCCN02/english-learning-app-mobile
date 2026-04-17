@@ -78,6 +78,7 @@
         <activity
             android:name=".controller.FlashCardImportActivity"
             android:exported="false" />
+        <activity android:name=".controller.NotificationActivity" android:exported="false" />
 
     </application>
 

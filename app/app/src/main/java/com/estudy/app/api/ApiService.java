@@ -31,6 +31,7 @@ import com.estudy.app.model.response.StartSessionResponse;
 import com.estudy.app.model.response.StatSummaryResponse;
 import com.estudy.app.model.response.StudyTodayResponse;
 import com.estudy.app.model.response.SuggestResponse;
+import com.estudy.app.model.response.NotificationResponse;
 import com.estudy.app.model.response.UserResponse;
 import java.util.List;
 import retrofit2.Call;
@@ -258,4 +259,14 @@ public interface ApiService {
     // ── UC-02: Sửa thông tin cá nhân ─────────────────────────────────
     @PUT("users/me")
     Call<ApiResponse<UserResponse>> updateProfile(@Body UpdateProfileRequest request);
+
+    // ── Notifications ─────────────────────────────────────────────
+    @GET("notifications")
+    Call<ApiResponse<List<NotificationResponse>>> getNotifications();
+
+    @PATCH("notifications/{id}/read")
+    Call<ApiResponse<Void>> markNotificationRead(@Path("id") String id);
+
+    @GET("notifications/unread-count")
+    Call<ApiResponse<Long>> getUnreadNotificationCount();
 }
