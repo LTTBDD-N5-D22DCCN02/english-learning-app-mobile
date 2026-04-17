@@ -14,6 +14,7 @@ import com.estudy.app.model.request.LogoutRequest;
 import com.estudy.app.model.request.RegisterRequest;
 import com.estudy.app.model.request.UpdateMemberRoleRequest;
 import com.estudy.app.model.request.StartSessionRequest;
+import com.estudy.app.model.request.UpdateProfileRequest;
 import com.estudy.app.model.response.ApiResponse;
 import com.estudy.app.model.response.AuthResponse;
 import com.estudy.app.model.response.ClassMemberResponse;
@@ -30,6 +31,7 @@ import com.estudy.app.model.response.StartSessionResponse;
 import com.estudy.app.model.response.StatSummaryResponse;
 import com.estudy.app.model.response.StudyTodayResponse;
 import com.estudy.app.model.response.SuggestResponse;
+import com.estudy.app.model.response.NotificationResponse;
 import com.estudy.app.model.response.UserResponse;
 import java.util.List;
 import retrofit2.Call;
@@ -249,4 +251,22 @@ public interface ApiService {
     // ── UC-STAT-06: Set Progress ──────────────────────────────────────
     @GET("study/stats/sets")
     Call<ApiResponse<List<SetProgressResponse>>> getSetProgress();
+
+    // ── UC-01: Xem thông tin cá nhân ──────────────────────────────────
+    @GET("users/me")
+    Call<ApiResponse<UserResponse>> getMyProfile();
+
+    // ── UC-02: Sửa thông tin cá nhân ─────────────────────────────────
+    @PUT("users/me")
+    Call<ApiResponse<UserResponse>> updateProfile(@Body UpdateProfileRequest request);
+
+    // ── Notifications ─────────────────────────────────────────────
+    @GET("notifications")
+    Call<ApiResponse<List<NotificationResponse>>> getNotifications();
+
+    @PATCH("notifications/{id}/read")
+    Call<ApiResponse<Void>> markNotificationRead(@Path("id") String id);
+
+    @GET("notifications/unread-count")
+    Call<ApiResponse<Long>> getUnreadNotificationCount();
 }

@@ -557,9 +557,20 @@ public class ClassService {
                 .clazz(aClass)
                 .build();
 
-        return flashCardSetMapper.toFlashCardSetResponse(
-                flashCardSetRepository.save(flashCardSet)
-        );
+        FlashCardSet saved = flashCardSetRepository.save(flashCardSet);
+
+        // Gửi thông báo cho tất cả thành viên trong lớp (trừ người tạo)
+        classMemberRepository.findByClazzAndStatus(aClass, ClassMemberStatus.APPROVED)
+                .stream()
+                .filter(cm -> !cm.getUser().getId().equals(currentUser.getId()))
+                .forEach(cm -> sendNotification(
+                        cm.getUser(),
+                        currentUser.getFullName() + " đã thêm bộ flashcard \"" + saved.getName() + "\" vào lớp " + aClass.getName(),
+                        "new_set",
+                        saved.getId()
+                ));
+
+        return flashCardSetMapper.toFlashCardSetResponse(saved);
     }
 
     // UC-19: Sửa bộ Flashcard trong lớp học

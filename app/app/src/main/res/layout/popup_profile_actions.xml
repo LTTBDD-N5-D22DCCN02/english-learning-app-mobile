@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_popup_rounded"
+    android:padding="10dp"
+    android:minWidth="180dp"
+    android:elevation="8dp">
+
+    <!-- View Profile -->
+    <LinearLayout
+        android:id="@+id/btnViewProfile"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/bg_input"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Profile"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:textStyle="normal" />
+    </LinearLayout>
+
+    <!-- Log out -->
+    <LinearLayout
+        android:id="@+id/btnLogout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/bg_input">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Log out"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:textStyle="normal" />
+    </LinearLayout>
+
+</LinearLayout>
