@@ -115,6 +115,11 @@ public class HomeActivity extends AppCompatActivity {
         // Classes card
         if (cardClasses != null) cardClasses.setOnClickListener(v -> goToMyClasses());
 
+        // My Bot card
+        View cardMyBot = findViewById(R.id.cardMyBot);
+        if (cardMyBot != null) cardMyBot.setOnClickListener(v ->
+                startActivity(new Intent(this, BotChatActivity.class)));
+
         // Quick access buttons
         View btnQuickMyClasses  = findViewById(R.id.btnQuickMyClasses);
         View btnQuickDiscover   = findViewById(R.id.btnQuickDiscover);

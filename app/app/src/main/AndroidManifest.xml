@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:usesCleartextTraffic="true"
@@ -79,6 +80,7 @@
             android:name=".controller.FlashCardImportActivity"
             android:exported="false" />
         <activity android:name=".controller.NotificationActivity" android:exported="false" />
+        <activity android:name=".controller.BotChatActivity" android:exported="false" />
 
     </application>
 
